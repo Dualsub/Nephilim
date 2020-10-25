@@ -19,11 +19,9 @@ namespace Nephilim.Engine.Assets.Serializers
             return JsonConvert.DeserializeObject(source);
         }
 
-        public void Serlize(object value)
+        public void Serlize(string source)
         {
-            var serlizer = Newtonsoft.Json.JsonSerializer.Create();
-            serlizer.Serialize(,);
-
+            throw new NotImplementedException();
         }
     }
 }

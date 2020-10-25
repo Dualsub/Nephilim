@@ -10,7 +10,7 @@ namespace Nephilim.Engine.Assets
     class ResourceManager
     {
         private static Dictionary<string, string> assetPaths = new Dictionary<string, string>();
-        private static 
+
         public T Load<T>(string path)
         {
 #if DEBUG
