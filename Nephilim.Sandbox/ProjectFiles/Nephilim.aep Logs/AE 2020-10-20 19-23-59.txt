@@ -1,0 +1,8 @@
+  2020-10-20 19:23:59: Starting composition “Comp 1”.
+
+  Output To: C:\dev\nephilim\Nephilim\Resources\Sprites\God_[#####].png    2020-10-20 19:23:59: Finished composition “Comp 1”.
+
+
+  Total Time Elapsed: 0 Seconds
+Log closed on 2020-10-20 at 19:23:59
+

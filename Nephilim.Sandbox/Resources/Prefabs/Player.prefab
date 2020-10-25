@@ -1,0 +1,46 @@
+{
+  "TransformComponent": {
+    "position": {
+      "x": 0.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+
+    "rotation": {
+      "x": 0.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+
+    "scale": {
+      "x": 1.0,
+      "y": 1.0,
+      "z": 1.0
+    }
+  },
+  "TagComponent": {
+    "Tag": "Player"
+  },
+  "CameraFollowComponent": {
+  },
+  "SpriteRenderer": {
+    "TextureFile": "../../../Resources/Sprites/God_00000.png"
+  },
+  "MovementComponent": {
+    "Acceleration": 2000.0,
+    "MaxSpeed": 4.0,
+    "JumpAcceleration": 80000.0
+  },
+  "BoxCollider": {
+    "Width": 50.0,
+    "Height": 100.0
+  },
+  "RigidBody2D": {
+    "Density": 1.0,
+    "LinearDamping": 0.0,
+    "AngularDamping": 2.0,
+    "Friction": 0.5,
+    "Restitution": 0.0,
+    "FixedRotation": true
+  }
+}

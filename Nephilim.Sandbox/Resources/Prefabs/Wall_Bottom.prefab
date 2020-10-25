@@ -1,0 +1,33 @@
+{
+  "TransformComponent": {
+    "position": {
+    "x": 0.0,
+    "y": 0.0,
+    "z": 0.0
+    },
+
+    "rotation": {
+    "x": 0.0,
+    "y": 0.0,
+    "z": 0.0
+    },
+
+    "scale": {
+    "x": 1.0,
+    "y": 1.0,
+    "z": 1.0
+    }
+  },
+  "BoxCollider": {
+    "Width": 500.0,
+    "Height": 30.0
+  },
+    "RigidBody2D": {
+    "Density": 0.0,
+    "LinearDamping": 0.0,
+    "AngularDamping": 2.0,
+    "Friction": 2,
+    "Restitution": 0.0,
+    "FixedRotation": true
+  }
+}
