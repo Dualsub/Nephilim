@@ -8,7 +8,7 @@ using Nephilim.Engine.World;
 
 namespace Nephilim.Engine.Core
 {
-    public interface IDriver
+    public interface IApplicationContext
     {
         double UpdateFrequency { get; }
 

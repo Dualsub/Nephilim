@@ -1,5 +1,6 @@
 ﻿using OpenTK.Mathematics;
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization;
 
@@ -57,10 +58,12 @@ namespace Nephilim.Engine.Util
         public static Vector4 DeserlizeVector4(string name, ref SerializationInfo info)
         {
             var result = new Vector4();
-            result.X = (float)info.GetValue("Color.X", typeof(float));
-            result.Y = (float)info.GetValue("Color.Y", typeof(float));
-            result.Z = (float)info.GetValue("Color.Z", typeof(float));
-            result.W = (float)info.GetValue("Color.W", typeof(float));
+            Dictionary<string, float> values = (Dictionary<string, float>)info.GetValue("Color", typeof(Dictionary<string, float>));
+            result.X = values["r"];
+            result.Y = values["g"];
+            result.Z = values["b"];
+            result.W = values["a"];
+
             return result;
         }
         

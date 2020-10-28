@@ -1,0 +1,39 @@
+{
+  "SpriteSheet": "../../../Resources/Sprites/SamuraiSheet.png",
+  "CellWidth": 200,
+  "CellHeight": 200,
+  "Animations": {
+    "Idle": {
+      "Begin": 6,
+      "End": 13
+    },
+    "Run": {
+      "Begin": 20,
+      "End": 27
+    },
+    "Jump": {
+      "Begin": 14,
+      "End": 15
+    },
+    "Fall": {
+      "Begin": 34,
+      "End": 35
+    },
+    "TakeHit": {
+      "Begin": 30,
+      "End": 33
+    },
+    "Attack2": {
+      "Begin": 28,
+      "End": 33
+    },
+    "Attack1": {
+      "Begin": 0,
+      "End": 6
+    },
+    "Death": {
+      "Begin": 40,
+      "End": 45
+    }
+  }
+}

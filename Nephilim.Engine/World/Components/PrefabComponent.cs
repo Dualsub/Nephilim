@@ -8,7 +8,7 @@ using System.Text.Json.Serialization;
 namespace Nephilim.Engine.World.Components
 {
     [JsonObject(MemberSerialization.OptOut)]
-    class PrefabComponent : IComponent
+    public class PrefabComponent : IComponent
     {
         public string PrefabFile { get; }
         public Matrix4 Transform { get; }

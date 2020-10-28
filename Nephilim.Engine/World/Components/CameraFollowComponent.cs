@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Nephilim.Engine.World.Components
 {
-    class CameraFollowComponent : IComponent
+    public class CameraFollowComponent : IComponent
     {
     }
 }

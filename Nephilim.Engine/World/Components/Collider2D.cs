@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Nephilim.Engine.World.Components
 {
-    class Collider2D : IComponent
+    public class Collider2D : IComponent
     {
     }
 }

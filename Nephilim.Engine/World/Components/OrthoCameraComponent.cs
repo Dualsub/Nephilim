@@ -10,7 +10,7 @@ namespace Nephilim.Engine.World.Components
     {
         private Matrix4 _transform;
         private Matrix4 _projectionMatrix;
-        private Vector2 _offset;
+        private Vector2 _offset = new Vector2(0);
         private bool _isProjectionDirty = false;
         private float _zoom = 1.0f;
         public float Speed { get; set; } = 100;
@@ -21,7 +21,7 @@ namespace Nephilim.Engine.World.Components
             set
             {
                 _isProjectionDirty = true;
-                _zoom = Math.Max(value, 0.0001f);
+                _zoom = Math.Min(Math.Max(value, 0.0001f), 1000);
             }
         }
 
@@ -71,7 +71,7 @@ namespace Nephilim.Engine.World.Components
             _transform *= Matrix4.CreateTranslation(position.X, position.Y, 0);
         }
 
-        public Matrix4 GetViewMatrix() => Matrix4.LookAt(_transform.ExtractTranslation() + new Vector3(_offset), _transform.ExtractTranslation() + new Vector3(_offset) + -Vector3.UnitZ, Vector3.UnitY);
+        public Matrix4 GetViewMatrix() => Matrix4.LookAt(_transform.ExtractTranslation() + new Vector3(_offset.X, _offset.Y, 0), _transform.ExtractTranslation() + new Vector3(_offset.X, _offset.Y, 0) + -Vector3.UnitZ, Vector3.UnitY);
 
         public bool IsProjectionMatrixDirty() => _isProjectionDirty;
     }

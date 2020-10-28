@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Nephilim.Engine.World.Components
 {
     [JsonObject(MemberSerialization.Fields)]
-    class ParallaxComponent : IComponent
+    public class ParallaxComponent : IComponent
     {
         public float FarValue = 0;
     }

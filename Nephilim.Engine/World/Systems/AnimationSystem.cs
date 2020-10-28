@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Nephilim.Engine.World.Systems
 {
-    class AnimationSystem : System
+    public class AnimationSystem : System
     {
         protected override void OnUpdate(Registry registry, double dt)
         {

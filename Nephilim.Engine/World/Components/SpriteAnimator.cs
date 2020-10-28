@@ -1,4 +1,5 @@
 ﻿using Nephilim.Engine.Rendering;
+using Nephilim.Engine.Util;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Runtime.Serialization;
 namespace Nephilim.Engine.World.Components
 {
     [Serializable]
-    class SpriteAnimator : IComponent, ISerializable
+    public class SpriteAnimator : IComponent, ISerializable
     {
         private SpriteSheet _sheet = null;
         private int _beginIndex = 0, _endIndex = 0;
@@ -19,6 +20,7 @@ namespace Nephilim.Engine.World.Components
         public float TimeCache { get; set; } = 0;
         public int CurrentFrame { get => _currentFrame; }
 
+        public bool IsAnimationFinished { get => !_loop && _currentFrame == _endIndex; }
         public SpriteAnimator()
         {
 
@@ -60,8 +62,22 @@ namespace Nephilim.Engine.World.Components
 
         public void SetAnimation(string name, bool loop = true)
         {
+            if (CurrentAnimation == name)
+                return;
             _loop = loop;
             if(_animations.TryGetValue(name, out AnimationFrame value))
+            {
+                _beginIndex = value.Begin;
+                _endIndex = value.End;
+                _currentFrame = _beginIndex;
+                CurrentAnimation = name;
+            }
+        }
+
+        public void ForceAnimation(string name, bool loop)
+        {
+            _loop = loop;
+            if (_animations.TryGetValue(name, out AnimationFrame value))
             {
                 _beginIndex = value.Begin;
                 _endIndex = value.End;

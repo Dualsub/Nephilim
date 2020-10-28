@@ -4,7 +4,7 @@ using OpenTK.Mathematics;
 namespace Nephilim.Engine.World.Components
 {
     [JsonObject(MemberSerialization.OptOut)]
-    class HealthComponent : IComponent
+    public class HealthComponent : IComponent
     {
         [JsonIgnore]
         private float _currentHealth = 0;

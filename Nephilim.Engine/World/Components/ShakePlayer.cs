@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Nephilim.Engine.World.Components
 {
     [JsonObject(MemberSerialization.OptOut)]
-    class ShakePlayer : IComponent
+    public class ShakePlayer : IComponent
     {
         [JsonIgnore]
         public float StartAngle { get; internal set; }

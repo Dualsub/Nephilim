@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Nephilim.Engine.World.Components
 {
     [JsonObject(MemberSerialization.OptOut)]
-    class LifeTimeComponent : IComponent
+    public class LifeTimeComponent : IComponent
     {
         public float LifeTime { get; } = 1;
 

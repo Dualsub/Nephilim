@@ -1,4 +1,6 @@
-﻿using Nephilim.Engine.Util;
+﻿using Nephilim.Engine.Assets.Loaders;
+using Nephilim.Engine.Util;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -7,9 +9,10 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Nephilim.Engine.Assets
 {
-    class ResourceManager
+    class AssetManager
     {
-        private static Dictionary<string, string> assetPaths = new Dictionary<string, string>();
+        private static Dictionary<string, string> _assetPaths = new Dictionary<string, string>();
+        private static Dictionary<Type, ILoader> _loaders = new Dictionary<Type, ILoader>();
 
         public T Load<T>(string path)
         {
@@ -19,12 +22,15 @@ namespace Nephilim.Engine.Assets
             return LoadFromPackage<T>(path);
 #endif
         }
-#if DEBUG
-        private T LoadFromProject<T>(string path)
+//#if DEBUG
+        private T LoadFromProject<T>(string name)
         {
-            return (T)new object();
+            if (_assetPaths.TryGetValue(name, out var path) && _loaders.TryGetValue(typeof(T), out var loader))
+                return loader.Load<T, string>(path);
+
+            throw new Exception($"Could not load asset {name}.");
         }
-#else
+//#else
         private T LoadFromPackage<T>(string path)
         {
 
@@ -54,6 +60,6 @@ namespace Nephilim.Engine.Assets
             return (T)new object();
 
         }
-#endif
+//#endif
     }
 }

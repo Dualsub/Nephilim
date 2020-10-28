@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Nephilim.Engine.World.Components
 {
-    class MovementComponent : IComponent
+    public class MovementComponent : IComponent
     {
         public float MaxSpeed { get; set; } = 0;
         public float Acceleration { get; set; } = 0;

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Nephilim.Engine.World.Components
 {
     [Serializable]
-    class SpriteRenderer : IComponent, ISerializable
+    public class SpriteRenderer : IComponent, ISerializable
     {
         private Texture _texture;
 

@@ -5,6 +5,7 @@ using Nephilim.Engine.World.Components;
 using Newtonsoft.Json;
 using OpenTK.Mathematics;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -13,14 +14,14 @@ namespace Nephilim.Engine.Core
     public abstract class Application
     {
 
-        private IDriver _windowDriver = null;
-        private SimulationManager _simulationManager = null;
+        private IApplicationContext _appContext = null;
 
         public static float Width { get; private set; } = 0;
         public static float Height { get; private set; } = 0;
         public static double DeltaTime { get; private set; }
-
         public static float TimeDilation { get; set; } = 1;
+
+        List<ILayer> _layers = new List<ILayer>();
 
         public void Init(params string[] args)
         {
@@ -49,35 +50,34 @@ namespace Nephilim.Engine.Core
                 WindowConfig.FrameLimitType.Unlimited);
             }
 
+            SetContext(out var context, config);
+            _appContext = context;
 
-            _windowDriver = new GameDriver(config);
+            Width = _appContext.GetViewportSize().Item1;
+            Height = _appContext.GetViewportSize().Item2;
 
-            Width = _windowDriver.GetViewportSize().Item1;
-            Height = _windowDriver.GetViewportSize().Item2;
+            _appContext.Loaded += WindowDriver_Loaded;
+            _appContext.UnLoaded += WindowDriver_UnLoaded;
+            _appContext.Update += WindowDriver_Update;
+            _appContext.Render += WindowDriver_Render;
+            _appContext.Resize += WindowDriver_Resize;
 
-            _windowDriver.Loaded += WindowDriver_Loaded;
-            _windowDriver.UnLoaded += WindowDriver_UnLoaded;
-            _windowDriver.Update += WindowDriver_Update;
-            _windowDriver.Render += WindowDriver_Render;
-            _windowDriver.Resize += WindowDriver_Resize;
+            OnLoad();
 
-            _simulationManager = new SimulationManager();
-            OnLoad(ref _simulationManager);
-
-            _windowDriver.Init();
+            _appContext.Init();
             
-            _windowDriver.RunDriver();
+            _appContext.RunDriver();
 
         }
 
         private void WindowDriver_Loaded()
         {
-            _simulationManager.StartSimulation();
+            StartSimulation();
         }
 
         private void WindowDriver_UnLoaded()
         {
-            _simulationManager.DestroySimulation();
+            DestroySimulation();
         }
 
         private void WindowDriver_Resize(int x, int y)
@@ -89,15 +89,68 @@ namespace Nephilim.Engine.Core
         private void WindowDriver_Update(double dt)
         {
             DeltaTime = TimeDilation * dt;
-            _simulationManager.Update(DeltaTime);
+            Update(DeltaTime);
         }
         private void WindowDriver_Render()
         {
-            _simulationManager.Render();
-            _windowDriver.PostRender();
+            Render();
+            _appContext.PostRender();
         }
 
 
-        public abstract void OnLoad(ref SimulationManager simulationManager);
+        public abstract void OnLoad();
+
+        public virtual void SetContext(out IApplicationContext context, Configuration configuration)
+        {
+            // Sets the context to be a game context by default.
+            context = new DesktopContext(configuration);
+        }
+
+        public void PushLayer<T>(T layer) where T : ILayer
+        {
+            _layers.Add(layer);
+            layer.OnAdded();
+        }
+
+        public void PushLayer<T>() where T : ILayer
+        {
+            ILayer layer = (ILayer)Activator.CreateInstance(typeof(T));
+            _layers.Add(layer);
+            layer.OnAdded();
+        }
+
+        public void StartSimulation()
+        {
+            for (int i = 0; i < _layers.Count; i++)
+            {
+                _layers[i].OnStart();
+            }
+        }
+
+        public void Update(double dt)
+        {
+            for (int i = 0; i < _layers.Count; i++)
+            {
+                _layers[i].OnUpdateLayer(dt);
+            }
+        }
+
+        public void Render()
+        {
+            for (int i = 0; i < _layers.Count; i++)
+            {
+                _layers[i].OnRenderLayer();
+            }
+        }
+
+        public void DestroySimulation()
+        {
+            for (int i = 0; i < _layers.Count; i++)
+            {
+                _layers[i].OnDestroy();
+            }
+            _layers.Clear();
+        }
+
     }
 }

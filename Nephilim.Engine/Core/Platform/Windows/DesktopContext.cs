@@ -11,12 +11,12 @@ using Nephilim.Engine.Rendering;
 
 namespace Nephilim.Engine.Core
 {
-    class GameDriver : GameWindow, IDriver
+    class DesktopContext : GameWindow, IApplicationContext
     {
 
         Stopwatch _sw = null;
 
-        double IDriver.UpdateFrequency { get => UpdateFrequency; }
+        double IApplicationContext.UpdateFrequency { get => UpdateFrequency; }
         public TimeSpan DeltaTime { get; private set; }
 
         public float WindowWidth { get => Size.X; }
@@ -34,7 +34,7 @@ namespace Nephilim.Engine.Core
         double fpsTimeCache = 0;
 #endif
 
-        public GameDriver(Configuration gameConfig) : base(GetGameWindowSettings(), GetNativeWindowSettings())
+        public DesktopContext(Configuration gameConfig) : base(GetGameWindowSettings(), GetNativeWindowSettings())
         {
 #if DEBUG
             title = gameConfig.WindowConfig.Title;
@@ -84,12 +84,12 @@ namespace Nephilim.Engine.Core
             InputManager.Init(this);
             GraphicsContext.Init(this);
             GraphicsContext.MakeCurrent();
-            Move += GameDriver_Move;
+            Move += Context_Move;
             _sw = new Stopwatch();
             _sw.Start();
         }
 
-        private void GameDriver_Move(WindowPositionEventArgs obj)
+        private void Context_Move(WindowPositionEventArgs obj)
         {
         }
 
@@ -114,9 +114,9 @@ namespace Nephilim.Engine.Core
             Loaded.Invoke();
         }
 
-        private void GameDriver_Load()
+        private void Context_Load()
         {
-            throw new NotImplementedException();
+            
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)

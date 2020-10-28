@@ -1,4 +1,5 @@
-﻿using Nephilim.Engine.Util;
+﻿using Nephilim.Engine.Assets;
+using Nephilim.Engine.Util;
 using Nephilim.Engine.World.Components;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -14,7 +15,7 @@ using System.Text;
 
 namespace Nephilim.Engine.World
 {
-    internal class Registry
+    public class Registry
     {
         public static int entityIDCounter = 0;
 
@@ -22,6 +23,7 @@ namespace Nephilim.Engine.World
 
         private Dictionary<Type, Dictionary<EntityID, IComponent>> _components = new Dictionary<Type, Dictionary<EntityID, IComponent>>();
         private Dictionary<Type, Tuple<EntityID, ISingletonComponent>> _singletonComponents = new Dictionary<Type, Tuple<EntityID, ISingletonComponent>>();
+
         private Dictionary<string, EntityID> _tags = new Dictionary<string, EntityID>();
 
         private List<Tuple<EntityID, IComponent[]>> _spawnBuffer = new List<Tuple<EntityID, IComponent[]>>();
@@ -237,7 +239,7 @@ namespace Nephilim.Engine.World
         {
             for (int i = 0; i < _systems.Count; i++)
             {
-                if ((_systems[i].Item1 & System.UpdateFlags.Update) == System.UpdateFlags.Update && _systems[i].Item2.IsActive)
+                if ((_systems[i].Item1 & System.UpdateFlags.Render) == System.UpdateFlags.Render && _systems[i].Item2.IsActive)
                     _systems[i].Item2.Render(this);
             }
         }
@@ -260,6 +262,29 @@ namespace Nephilim.Engine.World
         {
             System system = (System)Activator.CreateInstance(typeof(T));
             _systems.Insert(0, new Tuple<System.UpdateFlags, System>(flags, system));
+        }
+
+        public void ActiveSystem<T>()
+        {
+            foreach (var system in _systems)
+            {
+                if (typeof(T) == system.Item2.GetType())
+                {
+                    system.Item2.IsActive = true;
+                }
+            }
+        }
+
+        public void DeactivateSystem<T>()
+        {
+            foreach (var system in _systems)
+            {
+                if (typeof(T) == system.Item2.GetType())
+                {
+                    Log.Print(typeof(T));
+                    system.Item2.IsActive = false;
+                }
+            }
         }
 
         public bool AddSingletonComponent<T>(Entity entity, T component) where T : ISingletonComponent

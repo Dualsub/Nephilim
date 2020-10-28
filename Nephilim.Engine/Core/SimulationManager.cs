@@ -6,8 +6,6 @@ namespace Nephilim.Engine.Core
     public class SimulationManager
     {
 
-        public static bool IsLoading { get; set; } = false;
-
         List<ILayer> _layers = new List<ILayer>();
 
         public void PushLayer<T>() where T : ILayer  

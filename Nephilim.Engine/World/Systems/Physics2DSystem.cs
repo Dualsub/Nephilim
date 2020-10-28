@@ -64,9 +64,12 @@ namespace Nephilim.Engine.World.Systems
 					{
 						if (transform.ParentTag != string.Empty)
 							continue;
-
+						Log.Print("Before");
+						Log.Print(transform.Transform);
 						var body = registry.GetComponent<RigidBody2D>(entity);
 						transform.SetTransform(body.Position, body.Angle);
+						Log.Print("After");
+						Log.Print(transform.Transform);
 						if (registry.HasComponent<CameraFollowComponent>(entity) 
 							&& registry.TryGetSingletonComponent(out OrthoCameraComponent cameraComponent))
 						{

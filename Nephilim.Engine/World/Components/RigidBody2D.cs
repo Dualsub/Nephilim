@@ -7,14 +7,26 @@ using Newtonsoft.Json;
 namespace Nephilim.Engine.World.Components
 {
     [JsonObject(MemberSerialization.OptOut)]
-    class RigidBody2D : IComponent
+    public class RigidBody2D : IComponent
     {
 
         [JsonIgnore]
         private Body _body = null;
 
         [JsonIgnore]
-        public Vector2 Position { get => UtilFunctions.FromVec2(_body.GetPosition()) * PhysicsWorld2D.PixelToMeter; }
+        public Vector2 Position 
+        { 
+            get => UtilFunctions.FromVec2(_body.GetPosition()) * PhysicsWorld2D.PixelToMeter;
+            
+            set
+            {
+                if (!(_body is null))
+                {
+                    _body.SetPosition(UtilFunctions.ToVec2(value / PhysicsWorld2D.PixelToMeter));
+                }
+            }
+
+        }
         [JsonIgnore]
         public float Angle { get => _body.GetAngle(); }
 

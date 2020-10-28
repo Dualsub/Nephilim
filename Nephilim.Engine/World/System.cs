@@ -58,7 +58,7 @@ namespace Nephilim.Engine.World
         }
     }
 
-    internal abstract class System
+    public abstract class System
     {
 
         [Flags]

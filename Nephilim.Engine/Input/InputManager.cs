@@ -4,7 +4,7 @@ using OpenTK.Windowing.Desktop;
 
 namespace Nephilim.Engine.Input
 {
-    static class InputManager
+    public static class InputManager
     {
         private static GameWindow _driver = null;
 

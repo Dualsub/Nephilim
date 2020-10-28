@@ -76,7 +76,7 @@ namespace Nephilim.Engine.Core
         Windows, Web, iOS, Android, None
     }
 
-    internal class Configuration
+    public class Configuration
     {
         internal WindowConfig WindowConfig { get; set; } = new WindowConfig();
         internal GameConfig GameConfig { get; set; } = new GameConfig();

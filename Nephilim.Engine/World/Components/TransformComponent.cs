@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Nephilim.Engine.World.Components
 {
     [Serializable]
-    class TransformComponent : IComponent, ISerializable
+    public class TransformComponent : IComponent, ISerializable
     {
         private Matrix4 _transform;
         private Matrix4 _defaultTransform;
@@ -27,8 +27,7 @@ namespace Nephilim.Engine.World.Components
 
             set
             {
-                _transform = _transform.ClearTranslation();
-                _transform *= Matrix4.CreateTranslation(value);
+                _transform = _transform.ClearTranslation() * Matrix4.CreateTranslation(value);
             }
         }
         public Vector3 Scale 
@@ -36,8 +35,7 @@ namespace Nephilim.Engine.World.Components
             get => _transform.ExtractScale();
             set
             {
-                _transform = _transform.ClearScale();
-                _transform *= Matrix4.CreateScale(value);
+                _transform =  Matrix4.CreateScale(value) * _transform.ClearScale();
             }
         }
         public Quaternion Rotation 
@@ -46,7 +44,7 @@ namespace Nephilim.Engine.World.Components
             set
             {
                 _transform = _transform.ClearRotation();
-                _transform *= Matrix4.CreateFromQuaternion(value);
+                _transform = Matrix4.CreateFromQuaternion(value) * _transform;
             }
         }
 
@@ -65,8 +63,8 @@ namespace Nephilim.Engine.World.Components
             Matrix4 transform = Matrix4.Identity;
 
             transform *= Matrix4.CreateScale(scale);
-            transform *= Matrix4.CreateFromQuaternion(rotation);
             transform *= Matrix4.CreateTranslation(position);
+            transform *= Matrix4.CreateFromQuaternion(rotation);
 
             _transform = transform;
         }
@@ -80,13 +78,12 @@ namespace Nephilim.Engine.World.Components
 
         public void SetTransform(Vector2 position, float angle)
         {
-            Matrix4 transform = Matrix4.Identity;
-
-            transform *= Matrix4.CreateScale(_transform.ExtractScale());
-            transform *= Matrix4.CreateRotationZ(angle);
-            transform *= Matrix4.CreateTranslation(position.X, position.Y, _transform.ExtractTranslation().Z);
-
-            _transform = transform;
+            Log.Print("Before");
+            Log.Print(_transform.ExtractScale());
+            _transform = _transform.ClearRotation() * Matrix4.CreateRotationZ(angle);
+            _transform = _transform.ClearTranslation() * Matrix4.CreateTranslation(position.X, position.Y, _transform.ExtractTranslation().Z);
+            Log.Print("After");
+            Log.Print(_transform.ExtractScale());
         }
 
         public void SetAngle(float angle)
@@ -117,7 +114,7 @@ namespace Nephilim.Engine.World.Components
             
             Vector3 scale = new Vector3(x, y, z);
 
-            _transform = Matrix4.CreateScale(scale);
+            _transform  = Matrix4.CreateScale(scale) * _transform;
 
 //          Log.Print($"Scale is {_transform.ExtractScale()} and the file said {scale}.");
 
@@ -127,7 +124,7 @@ namespace Nephilim.Engine.World.Components
 
             try
             {
-                Dictionary<string, float> read_rotation = (Dictionary<string, float>)info.GetValue("position", typeof(Dictionary<string, float>));
+                Dictionary<string, float> read_rotation = (Dictionary<string, float>)info.GetValue("rotation", typeof(Dictionary<string, float>));
                 x = MathHelper.DegreesToRadians(read_rotation["x"]);
                 y = MathHelper.DegreesToRadians(read_rotation["y"]);
                 z = MathHelper.DegreesToRadians(read_rotation["z"]);

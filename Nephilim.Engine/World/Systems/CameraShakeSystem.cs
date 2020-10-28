@@ -5,7 +5,7 @@ using System;
 
 namespace Nephilim.Engine.World.Systems
 {
-    class CameraShakeSystem : System
+    public class CameraShakeSystem : System
     {
         protected override void OnUpdate(Registry registry, double dt)
         {
@@ -28,13 +28,14 @@ namespace Nephilim.Engine.World.Systems
                     shakeComponent.CurrentRadius -= shakeComponent.FallOff * (float)dt;
                     shakeComponent.StartAngle += (150 + new Random().Next(60));
 
-                    Log.Print(shakeComponent.FallOff);
-                }
-            }
+                    Log.Print(shakeComponent.CurrentRadius);
 
-            if (registry.TryGetSingletonComponent(out OrthoCameraComponent cameraComponent))
-            {
-                cameraComponent.SetOffset(offset);
+
+                    if (registry.TryGetSingletonComponent(out OrthoCameraComponent cameraComponent))
+                    {
+                        cameraComponent.SetOffset(offset);
+                    }
+                }
             }
         }
         

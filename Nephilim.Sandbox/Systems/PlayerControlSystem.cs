@@ -1,14 +1,15 @@
-﻿using Nephilim.Engine.Core;
-using Nephilim.Engine.Input;
+﻿using Nephilim.Engine.Input;
 using Nephilim.Engine.Util;
 using Nephilim.Engine.World.Components;
+using Nephilim.Engine.World;
 using OpenTK.Mathematics;
 using System;
+using Nephilim.Sandbox.Components;
+using OpenTK.Graphics.ES11;
 
-
-namespace Nephilim.Engine.World.Systems
+namespace Nephilim.Sandbox.Systems
 {
-    class PlayerControlSystem : System
+    class PlayerControlSystem : Nephilim.Engine.World.System
     {
 
         protected override void OnUpdate(Registry registry, double dt)
@@ -16,7 +17,7 @@ namespace Nephilim.Engine.World.Systems
             var entities = registry.GetEntitiesWithComponent<MovementComponent>();
             foreach (var entity in entities)
             {
-                if (registry.TryGetComponent(entity, out ShakePlayer shakePlayer) 
+                if (registry.TryGetComponent(entity, out ShakePlayer shakePlayer)
                     && InputManager.IsKeyDown(OpenTK.Windowing.GraphicsLibraryFramework.Keys.G))
                 {
                     shakePlayer.ShouldPlay = true;
@@ -24,6 +25,7 @@ namespace Nephilim.Engine.World.Systems
                 }
 
                 if (registry.TryGetComponent(entity, out RigidBody2D rigidBody)
+                && registry.TryGetComponent(entity, out SpriteAnimator animator)
                 && registry.TryGetComponent(entity, out TransformComponent transformComp))
                 {
                     var moveComp = registry.GetComponent<MovementComponent>(entity);
@@ -39,16 +41,23 @@ namespace Nephilim.Engine.World.Systems
 
                     rigidBody.ApplyForce(netForce * moveComp.Acceleration * (float)dt, new Vector2(0.0f, 0.0f));
 
-                    if (Math.Abs(rigidBody.Velocity.Y) > 0.1f)
+                    //transformComp.Scale = new Vector3(-1*Math.Abs(transformComp.Scale.X), transformComp.Scale.Y, 1);
+
+                    if (Math.Abs(rigidBody.Velocity.Y) > 0.01f)
                     {
+                        animator.SetAnimation(rigidBody.Velocity.Y >= 0 ? "Jump" : "Fall", true);
                         continue;
                     }
 
+                    if (Math.Abs(rigidBody.Velocity.X) > 0.1)
+                        animator.SetAnimation("Run");
+                    else
+                        animator.SetAnimation("Idle");
+
                     if (InputManager.IsKeyDown(OpenTK.Windowing.GraphicsLibraryFramework.Keys.Space))
                     {
-                        rigidBody.ApplyForce(Vector2.UnitY * moveComp.JumpAcceleration * (float)dt, new Vector2(0.0f, 0.0f));
+                        rigidBody.Velocity = new Vector2(rigidBody.Velocity.X, moveComp.JumpAcceleration);
                     }
-
 
                     if (rigidBody.Velocity.LengthSquared > Math.Pow(moveComp.MaxSpeed, 2))
                     {
@@ -57,9 +66,9 @@ namespace Nephilim.Engine.World.Systems
                 }
             }
 
-            foreach(var entity in registry.GetEntitiesWithComponent<GunComponent>())
+            foreach (var entity in registry.GetEntitiesWithComponent<PlayerStateComponent>())
             {
-                registry.GetComponent<GunComponent>(entity).WantsToFire = InputManager.IsMouseButtonDown(OpenTK.Windowing.GraphicsLibraryFramework.MouseButton.Left);
+                registry.GetComponent<PlayerStateComponent>(entity).WantToAttack = InputManager.IsMouseButtonDown(OpenTK.Windowing.GraphicsLibraryFramework.MouseButton.Left);
             }
         }
     }

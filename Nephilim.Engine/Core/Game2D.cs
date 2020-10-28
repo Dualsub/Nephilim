@@ -19,8 +19,10 @@ using static Nephilim.Engine.World.Registry;
 
 namespace Nephilim.Engine.Core
 {
-    public class GameLayer : ILayer
+    public class Game2D : ILayer
     {
+        public event Action<Registry> AddSystems;
+
         private Registry _registry = null;
         private double _fixedUpdateTime = 0f;
 
@@ -67,25 +69,23 @@ namespace Nephilim.Engine.Core
                 var entity2 = _registry.CreateAbstractEntity();
                 _ = _registry.AddSingletonComponent(entity2, new PhysicsWorld2D());
 
-                _registry.AddSystem<CrosshairSystem>(World.System.UpdateFlags.Update);
-                _registry.AddSystem<PlayerControlSystem>(World.System.UpdateFlags.Update);
+                AddSystems.Invoke(_registry);
+
                 _registry.AddSystem<ParallaxSystem>(World.System.UpdateFlags.Update);
                 _registry.AddSystem<Physics2DSystem>(World.System.UpdateFlags.FixedUpdate | World.System.UpdateFlags.EntitySpawned | World.System.UpdateFlags.EntityDestroyed);
                 _registry.AddSystem<CameraShakeSystem>(World.System.UpdateFlags.Update);
-                _registry.AddSystem<LifeTimeSystem>(World.System.UpdateFlags.Update);
-                _registry.AddSystem<EnemySystem>(World.System.UpdateFlags.FixedUpdate | World.System.UpdateFlags.Update);
-                _registry.AddSystem<WeaponSystem>(World.System.UpdateFlags.FixedUpdate);
+                //_registry.AddSystem<LifeTimeSystem>(World.System.UpdateFlags.Update);
+                //_registry.AddSystem<EnemySystem>(World.System.UpdateFlags.FixedUpdate | World.System.UpdateFlags.Update);
+                //_registry.AddSystem<WeaponSystem>(World.System.UpdateFlags.FixedUpdate);
                 _registry.AddSystem<TransformSystem>(World.System.UpdateFlags.EntitySpawned);
                 _registry.AddSystem<SpriteRenderSystem>(World.System.UpdateFlags.Render);
 
 #if DEBUG
                 _registry.AddSystem<ConsoleSystem>(World.System.UpdateFlags.LateUpdate);
                 _registry.AddSystem<DebugCameraSystem>(World.System.UpdateFlags.Update);
-                _registry.AddSystem<ColliderDebugSystem>(World.System.UpdateFlags.Render);
+                //_registry.AddSystem<ColliderDebugSystem>(World.System.UpdateFlags.Render);
 #endif
-
                 _registry.ActivateSystems();
-                Log.Print("Complete.");
             }
         }
 

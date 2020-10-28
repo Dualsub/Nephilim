@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Nephilim.Engine.World.Components
 {
     [JsonObject(MemberSerialization.OptOut)]
-    class BoxCollider : IComponent
+    public class BoxCollider : IComponent
     {
         public float Width { get; set; } = 0;
         public float Height { get; set; } = 0;
