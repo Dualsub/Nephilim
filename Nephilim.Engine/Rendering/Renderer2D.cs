@@ -33,7 +33,7 @@ namespace Nephilim.Engine.Rendering
             _camera = camera;
             if (!HasCamera)
                 return;
-            _shader = Shader.LoadShader("../../../Resources/Shaders/SimpleColor.glsl");
+            _shader = Shader.LoadShader("SimpleColor");
             _projectionMatrix = camera.GetProjectionMatrix();
 
             GL.Enable(EnableCap.DepthTest);

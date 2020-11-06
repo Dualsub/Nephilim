@@ -1,5 +1,6 @@
 ﻿using Nephilim.BuildTool.Builders;
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
@@ -12,6 +13,15 @@ namespace Nephilim.BuildTool
 {
     class Program
     {
+
+        public static Dictionary<string, Type> _builders = new Dictionary<string, Type>
+        {
+            {"game", typeof(GameBuilder) },
+            {"editor", typeof(EditorBuilder) },
+            {"assets", typeof(AssetBuilder) },
+
+        };
+
         static void Main(string[] args)
         {
 
@@ -19,18 +29,7 @@ namespace Nephilim.BuildTool
             IBuilder builder = null;
             if (args.Length > 0)
             {
-                switch(args[0].ToLower())
-                {
-                    case "game":
-                        builder = new GameBuilder();
-                        break;
-                    case "editor":
-                        builder = new EditorBuilder();
-                        break;
-                    default:
-                        Console.WriteLine("No builder selected.");
-                        break;
-                }
+                builder = (IBuilder)Activator.CreateInstance(_builders[args[0]]);
             }
 
             if (builder is null)

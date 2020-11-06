@@ -1,5 +1,6 @@
 ﻿using Nephilim.Engine.Assets.Loaders;
 using Nephilim.Engine.Util;
+using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,23 +15,23 @@ namespace Nephilim.Engine.Assets
         private static Dictionary<string, string> _assetPaths = new Dictionary<string, string>();
         private static Dictionary<Type, ILoader> _loaders = new Dictionary<Type, ILoader>();
 
-        public T Load<T>(string path)
-        {
-#if DEBUG
-            return LoadFromProject<T>(path);
-#elif RELEASE
-            return LoadFromPackage<T>(path);
-#endif
-        }
+//        public T Load<T>(string name)
+//        {
 //#if DEBUG
-        private T LoadFromProject<T>(string name)
-        {
-            if (_assetPaths.TryGetValue(name, out var path) && _loaders.TryGetValue(typeof(T), out var loader))
-                return loader.Load<T, string>(path);
+//            return LoadFromProject<T>(name);
+//#elif RELEASE
+//            return LoadFromPackage<T>(path);
+//#endif
+////        }
+//////#if DEBUG
+////        private T LoadFromProject<T>(string name)
+////        {
+////            if (_assetPaths.TryGetValue(name, out var path) && _loaders.TryGetValue(typeof(T), out var loader))
+////                return loader.Load<T, string>(path);
 
-            throw new Exception($"Could not load asset {name}.");
-        }
-//#else
+////            throw new Exception($"Could not load asset {name}.");
+//        }
+////#else
         private T LoadFromPackage<T>(string path)
         {
 

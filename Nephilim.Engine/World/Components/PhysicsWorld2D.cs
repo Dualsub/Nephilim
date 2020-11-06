@@ -18,29 +18,29 @@ namespace Nephilim.Engine.World.Components
 
         public Box2DX.Dynamics.World World { get => _world; set => _world = value; }
 
-        private BulletListner _bulletListner;
+        private ContactListner _contactListner;
 
-        public List<BulletHitResult> CollisionBuffer { get => _bulletListner is null ? new List<BulletHitResult>() : _bulletListner._collisionBuffer; }
+        public HashSet<BulletHitResult> BulletBuffer { get => _contactListner is null ? new HashSet<BulletHitResult>() : _contactListner._collisionBuffer; }
 
 
         public void SetBulletListner()
         {
-            _bulletListner = new BulletListner();
-            _world.SetContactListener(_bulletListner);
+            _contactListner = new ContactListner();
+            _world.SetContactListener(_contactListner);
         }
 
         public void ClearBulletBuffer()
         {
-            if (_bulletListner is null)
+            if (_contactListner is null)
                 return;
-            _bulletListner._collisionBuffer.Clear();
-            _bulletListner._pairBuffer.Clear();
+            _contactListner._collisionBuffer.Clear();
+            _contactListner._pairBuffer.Clear();
         }
 
-        private class BulletListner : ContactListener
+        private class ContactListner : ContactListener
         {
-            public List<BulletHitResult> _collisionBuffer = new List<BulletHitResult>();
-            public List<Tuple<EntityID, EntityID>> _pairBuffer = new List<Tuple<EntityID, EntityID>>();
+            public HashSet<BulletHitResult> _collisionBuffer = new HashSet<BulletHitResult>();
+            public HashSet<Tuple<EntityID, EntityID>> _pairBuffer = new HashSet<Tuple<EntityID, EntityID>>();
 
             public void BeginContact(Contact contact)
             {
@@ -110,6 +110,10 @@ namespace Nephilim.Engine.World.Components
 
         public struct HitResult
         {
+            public readonly EntityID entity1;
+            public readonly EntityID entity2;
+            public readonly Vector2 location;
+            public readonly Vector2 normal;
         }
     }
 }

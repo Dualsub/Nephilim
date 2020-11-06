@@ -1,5 +1,5 @@
 {
-  "SpriteSheet": "../../../Resources/Sprites/SamuraiSheet.png",
+  "SpriteSheet": "SamuraiSheet",
   "CellWidth": 200,
   "CellHeight": 200,
   "Animations": {

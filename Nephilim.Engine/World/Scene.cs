@@ -17,6 +17,10 @@ using System.Collections.Immutable;
 using System.Threading.Tasks;
 using System.Collections;
 using OpenTK.Mathematics;
+using Nephilim.Engine.Assets.Serializers;
+using Nephilim.Engine.Assets;
+using Nephilim.Engine.Core;
+using System.Threading;
 
 namespace Nephilim.Engine.World
 {
@@ -66,21 +70,13 @@ namespace Nephilim.Engine.World
             return new SceneData(components, singletonComponents, tags);
         }
 
-        public static async Task<SceneData> LoadSceneAsync(string path)
+        public static async Task<SceneData> LoadSceneAsync(string name)
         {
-            var serlizerSettings = new JsonSerializerSettings();
+            string fileText = Application.ResourceManager.Load<string>(name);
+
+            JsonSerializerSettings serlizerSettings = new JsonSerializerSettings();
 
             serlizerSettings.Formatting = Formatting.Indented;
-
-            string fileText;
-
-            using (var sr = new StreamReader(path, Encoding.UTF8))
-            {
-                fileText = sr.ReadToEnd();
-            }
-
-            if (string.IsNullOrEmpty(fileText))
-                return default;
 
             var tasks = new List<Task<List<EntityData>>>();
 
@@ -96,10 +92,8 @@ namespace Nephilim.Engine.World
         {
             string fileText;
 
-            using (var sr = new StreamReader(serializedPrefab.Path, Encoding.UTF8))
-            {
-                fileText = sr.ReadToEnd();
-            }
+            fileText = Application.ResourceManager.Load<string>(serializedPrefab.Name);
+
 
             if (string.IsNullOrEmpty(fileText))
                 return null;
@@ -167,8 +161,7 @@ namespace Nephilim.Engine.World
 
     public struct EntityData : IEnumerable<Tuple<Type, IComponent>>
     {
-        List<Tuple<Type, IComponent>> _components;
-
+        private List<Tuple<Type, IComponent>> _components;
         public List<Tuple<Type, IComponent>> Components { get => _components; }
 
         public EntityData(List<Tuple<Type, IComponent>> components)

@@ -1,4 +1,5 @@
-﻿using Nephilim.Engine.Physics;
+﻿using Nephilim.Engine.Assets;
+using Nephilim.Engine.Physics;
 using Nephilim.Engine.Rendering;
 using Nephilim.Engine.Util;
 using Nephilim.Engine.World;
@@ -30,6 +31,13 @@ namespace Nephilim.Engine.Core
         private Entity _loadingEntity;
         private Entity _loadingScreenCamera;
 
+        private string _defaultScene;
+
+        public Game2D(string defaultScene = "DefaultScene")
+        {
+            _defaultScene = defaultScene;
+        }
+
         public void OnAdded()
         {
             _registry = new Registry();
@@ -37,14 +45,19 @@ namespace Nephilim.Engine.Core
 
         public void OnStart()
         {
-            _loadingTask = Scene.LoadSceneAsync(@"../../../Resources/Scenes/DefaultScene.scene");
-
             _loadingEntity = _registry.CreateAbstractEntity();
-            _ =_registry.AddSingletonComponent(_loadingEntity, new LoadingScreenComponent());
+            var component = new LoadingScreenComponent();
+            component.Frames = new SpriteSheet(Application.ResourceManager.Load<Texture>("Frames"), 220, 50);
+            component.Transform *= Matrix4.CreateScale(1, 1f / 4.4f, 1);
+            component.Transform *= Matrix4.CreateFromAxisAngle(new Vector3(1), 0);
+            component.Transform *= Matrix4.CreateTranslation(0, 0, 0);
+            _ =_registry.AddSingletonComponent(_loadingEntity, component);
             _registry.AddSystem<LoadingScreenSystem>(World.System.UpdateFlags.Update | World.System.UpdateFlags.Render);
 
             _loadingScreenCamera = _registry.CreateAbstractEntity();
             _ = _registry.AddSingletonComponent(_loadingScreenCamera, new OrthoCameraComponent(_registry.CachedTransform != Matrix4.Identity ? _registry.CachedTransform : Matrix4.Identity));
+            
+            _loadingTask = Scene.LoadSceneAsync(_defaultScene);
             
             _registry.ActivateSystems();
         }
@@ -60,6 +73,8 @@ namespace Nephilim.Engine.Core
                 _registry.DeactivateSystems();
                 _registry.DestroyEntity(_loadingEntity);
                 _registry.DestroyEntity(_loadingScreenCamera);
+
+                Application.ResourceManager.EndLoading();
 
                 _registry.LoadSceneData(task.Result);
 

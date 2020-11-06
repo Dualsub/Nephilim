@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -80,5 +81,35 @@ namespace Nephilim.Engine.Core
     {
         internal WindowConfig WindowConfig { get; set; } = new WindowConfig();
         internal GameConfig GameConfig { get; set; } = new GameConfig();
+
+        public static Configuration Load()
+        {
+            var config = new Configuration();
+            string windowPath = @"../../../Configs/Window.config";
+
+            if (File.Exists(windowPath))
+            {
+                var settings = new JsonSerializerSettings();
+                settings.Formatting = Formatting.Indented;
+
+                string fileText;
+
+                using (var sr = new StreamReader(windowPath, Encoding.UTF8))
+                {
+                    fileText = sr.ReadToEnd();
+                }
+
+                config.WindowConfig = JsonConvert.DeserializeObject<WindowConfig>(fileText, settings);
+            }
+            else
+            {
+                config.WindowConfig = new WindowConfig("Nephilim",
+                1600, 900,
+                WindowConfig.WindowState.Windowed,
+                WindowConfig.FrameLimitType.Unlimited);
+            }
+
+            return config;
+        }
     }
 }

@@ -1,0 +1,9 @@
+Nephilim crash from 2020-11-06 17:32:49
+Message:
+	Empty path name is not legal. (Parameter 'path')
+StackTrace:
+	   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options)
+   at System.IO.FileStream..ctor(String path, FileMode mode)
+   at Nephilim.Engine.Assets.ResourceManager.StartLoading() in C:\dev\csharp\nephilim\Nephilim.Engine\Assets\ResourceManager.cs:line 41
+   at Nephilim.Engine.Core.Application.Run(String[] args) in C:\dev\csharp\nephilim\Nephilim.Engine\Core\Application.cs:line 49
+   at Nephilim.Desktop.Program.Main(String[] args) in C:\dev\csharp\nephilim\Nephilim.Desktop\Program.cs:line 23

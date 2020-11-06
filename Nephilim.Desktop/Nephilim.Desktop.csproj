@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <ApplicationIcon>NephilimIcon.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Nephilim.Sandbox\Nephilim.Sandbox.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="CrashReports\" />
+  </ItemGroup>
+
+</Project>

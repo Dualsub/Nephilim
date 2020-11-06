@@ -1,6 +1,7 @@
 ﻿using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization;
 
@@ -116,6 +117,28 @@ namespace Nephilim.Engine.Util
                 }
 
             return null;
+        }
+        
+        public static string FindFilePath(string relativePath, int maxNumTries = 5)
+        {
+            string searchPath = string.Empty;
+
+            for (int i = 0; i < maxNumTries; i++)
+            {
+                searchPath += "../";
+                Log.Print(Path.GetFullPath(searchPath));
+
+                foreach (var dir in Directory.EnumerateDirectories(Path.GetFullPath(searchPath)))
+                {
+                    Log.Print("\t" + dir);
+                }
+
+                
+                if(File.Exists(Path.Combine(searchPath, relativePath)))
+                    return Path.Combine(searchPath, relativePath);
+            }
+
+            return string.Empty;
         }
 
     }

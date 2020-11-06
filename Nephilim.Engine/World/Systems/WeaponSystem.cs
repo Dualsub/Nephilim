@@ -62,7 +62,7 @@ namespace Nephilim.Engine.World.Systems
             }
             if (registry.TryGetSingletonComponent(out PhysicsWorld2D physicsWorld))
             {
-                foreach (var item in physicsWorld.CollisionBuffer)
+                foreach (var item in physicsWorld.BulletBuffer)
                 {
                     if (registry.TryGetComponent(item.entity2, out BulletComponent bulletComp) 
                     && registry.TryGetComponent(item.entity1, out HealthComponent healthComp))

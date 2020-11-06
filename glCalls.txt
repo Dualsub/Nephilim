@@ -1,0 +1,66 @@
+
+public void Viewport(int i, int j, int width, int height);
+
+public int GenBuffer(int i);
+
+public int GenVertexArray(int i);
+
+public void BindVertexArray(int id);
+
+public void BindVertexArray(int i);
+
+public void BindVertexArray(int vao);
+
+public void EnableVertexAttribArray(int i);
+
+public void EnableVertexAttribArray(int i);
+
+public void DisableVertexAttribArray(int i);
+
+public void DisableVertexAttribArray(int i);
+
+public void Enable(EnableCap enablecap);
+
+public void ClearColor(Vector4 color);
+
+public void DeleteVertexArray(int i);
+
+public void DeleteBuffer(int i);
+
+public void DeleteTexture(int i);
+
+public void UseProgram(int id);
+
+public void UseProgram(int i);
+
+public void Uniform4(int i);
+
+public void CreateProgram(int i);
+
+public void AttachShader(int id);
+
+public void AttachShader(int id);
+
+public void LinkProgram(int id);
+
+public void ValidateProgram(int id);
+
+public void CreateShader(int i);
+
+public void ShaderSource(int id,int i);
+
+public void CompileShader(int id);
+
+public void GetShaderInfoLog(int id);
+
+public void GetUniformLocation(int id,int i);
+
+public void DeleteShader(int id);
+
+public void DeleteShader(int id);
+
+public void DeleteProgram(int id);
+
+public void ActiveTexture(TextureUnit textureunit);
+
+public int GenTexture(int i);

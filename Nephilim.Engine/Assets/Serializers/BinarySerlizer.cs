@@ -16,7 +16,7 @@ namespace Nephilim.Engine.Assets.Serializers
             throw new NotImplementedException();
         }
 
-        public void Serlize(string source)
+        public void Serlize(string source, string output)
         {
             throw new NotImplementedException();
         }

@@ -1,6 +1,6 @@
 [
   {
-    "Path": "../../../Resources/Prefabs/Player.prefab",
+    "Name": "Player",
     "position": {
       "x": 0.0,
       "y": 1000.0,
@@ -20,10 +20,10 @@
     }
   },
   {
-    "Path": "../../../Resources/Prefabs/Background.prefab"
+    "Name": "Background"
   },
   {
-    "Path": "../../../Resources/Prefabs/Wall.prefab",
+    "Name": "Wall",
     "position": {
       "x": 250.0,
       "y": 0.0,
@@ -43,6 +43,6 @@
     }
   },
   {
-    "Path": "../../../Resources/Prefabs/Floor.prefab"
+    "Name": "Floor"
   }
 ]

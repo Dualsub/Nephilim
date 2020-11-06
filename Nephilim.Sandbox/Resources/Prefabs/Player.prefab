@@ -29,7 +29,7 @@
     "Frequency": 20
   },
   "SpriteAnimator": {
-    "AnimationFile": "../../../Resources/Animations/Samurai.anim",
+    "AnimationFile": "Samurai",
     "DefaultAnimation": "Run",
     "FrameRate": 12.0
   },

@@ -1,6 +1,8 @@
 ﻿using Nephilim.Engine.World.Components;
 using Nephilim.Engine.Rendering;
 using OpenTK.Mathematics;
+using Nephilim.Engine.Core;
+using Nephilim.Engine.Util;
 
 namespace Nephilim.Engine.World.Systems
 {
@@ -11,13 +13,6 @@ namespace Nephilim.Engine.World.Systems
             if(registry.TryGetSingletonComponent(out OrthoCameraComponent cameraComponent))
             {
                 Renderer2D.Init(cameraComponent, new Color4(0,0,0,1));
-            }
-            if (registry.TryGetSingletonComponent(out LoadingScreenComponent component))
-            {
-                component.Frames = new SpriteSheet(Texture.LoadTexture("../../../Resources/LoadingScreen/Frames.png"), 220, 50);
-                component.Transform *= Matrix4.CreateScale(1,1f/4.4f,1);
-                component.Transform *= Matrix4.CreateFromAxisAngle(new Vector3(1),0);
-                component.Transform *= Matrix4.CreateTranslation(0, 0, 0);
             }
         }
 

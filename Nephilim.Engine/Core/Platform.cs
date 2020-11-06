@@ -1,3 +1,0 @@
-﻿namespace Nephilim.Engine.Core
-{
-}

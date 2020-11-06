@@ -6,7 +6,7 @@ namespace Nephilim.Engine.Assets.Loaders
 {
     interface ILoader
     {
-        T Load<T, P>(P data);
+        object Load(string name, ResourceData resourceData);
 
     }
 }

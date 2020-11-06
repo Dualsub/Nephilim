@@ -1,16 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Nephilim.Engine\Nephilim.Engine.csproj" />
+    <Compile Remove="ProjectFiles\**" />
+    <EmbeddedResource Remove="ProjectFiles\**" />
+    <None Remove="ProjectFiles\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ProjectFiles\" />
+    <ProjectReference Include="..\Nephilim.Engine\Nephilim.Engine.csproj" />
   </ItemGroup>
 
 </Project>

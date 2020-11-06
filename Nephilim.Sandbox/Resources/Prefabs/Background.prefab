@@ -19,7 +19,7 @@
 	    }
   },
     "SpriteRenderer": {
-    "TextureFile": "../../../Resources/Sprites/BGStars.png"
+    "TextureFile": "BGStars"
   },
     "ParallaxComponent": {
     "FarValue" : 0.0

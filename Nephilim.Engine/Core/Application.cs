@@ -1,4 +1,5 @@
 ﻿
+using Nephilim.Engine.Assets;
 using Nephilim.Engine.Util;
 using Nephilim.Engine.World;
 using Nephilim.Engine.World.Components;
@@ -11,7 +12,7 @@ using System.Text;
 
 namespace Nephilim.Engine.Core
 {
-    public abstract class Application
+    public abstract class Application : IDisposable
     {
 
         private IApplicationContext _appContext = null;
@@ -21,37 +22,17 @@ namespace Nephilim.Engine.Core
         public static double DeltaTime { get; private set; }
         public static float TimeDilation { get; set; } = 1;
 
+        public static ResourceManager ResourceManager { get; private set; }
+
         List<ILayer> _layers = new List<ILayer>();
 
-        public void Init(params string[] args)
+        public void Run(params string[] args)
         {
-            var config = new Configuration();
-            string windowPath = @"../../../Configs/Window.config";
-
-            if (File.Exists(windowPath))
+            if(_appContext is null)
             {
-                var settings = new JsonSerializerSettings();
-                settings.Formatting = Formatting.Indented;
-
-                string fileText;
-
-                using (var sr = new StreamReader(windowPath, Encoding.UTF8))
-                {
-                    fileText = sr.ReadToEnd();
-                }
-                
-                config.WindowConfig = JsonConvert.DeserializeObject<WindowConfig>(fileText, settings);
+                SetContext(out var context, Configuration.Load());
+                _appContext = context;
             } 
-            else
-            {
-                config.WindowConfig = new WindowConfig("Nephilim",
-                1600, 900,
-                WindowConfig.WindowState.Windowed,
-                WindowConfig.FrameLimitType.Unlimited);
-            }
-
-            SetContext(out var context, config);
-            _appContext = context;
 
             Width = _appContext.GetViewportSize().Item1;
             Height = _appContext.GetViewportSize().Item2;
@@ -61,6 +42,9 @@ namespace Nephilim.Engine.Core
             _appContext.Update += WindowDriver_Update;
             _appContext.Render += WindowDriver_Render;
             _appContext.Resize += WindowDriver_Resize;
+
+            ResourceManager = new ResourceManager();
+            ResourceManager.StartLoading();
 
             OnLoad();
 
@@ -152,5 +136,9 @@ namespace Nephilim.Engine.Core
             _layers.Clear();
         }
 
+        public void Dispose()
+        {
+            
+        }
     }
 }

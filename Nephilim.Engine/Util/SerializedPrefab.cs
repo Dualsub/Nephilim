@@ -8,21 +8,21 @@ namespace Nephilim.Engine.Util
     [Serializable]
     struct SerializedPrefab : ISerializable
     {
-        public string Path;
+        public string Name;
         public Matrix4 Transform;
         [NonSerialized]
         public string ParentID;
 
-        public SerializedPrefab(string path, Matrix4 transform)
+        public SerializedPrefab(string name, Matrix4 transform)
         {
-            Path = path ?? throw new ArgumentNullException(nameof(path));
+            Name = name ?? throw new ArgumentNullException(nameof(name));
             Transform = transform;
             ParentID = string.Empty;
         }
 
-        public SerializedPrefab(string path, string parentID, Matrix4 transform)
+        public SerializedPrefab(string name, string parentID, Matrix4 transform)
         {
-            Path = path ?? throw new ArgumentNullException(nameof(path));
+            Name = name ?? throw new ArgumentNullException(nameof(name));
             Transform = transform;
             this.ParentID = parentID;
         }
@@ -32,7 +32,7 @@ namespace Nephilim.Engine.Util
         {
             ParentID = string.Empty;
 
-            Path = (string)info.GetValue("Path", typeof(string));
+            Name = (string)info.GetValue("Name", typeof(string));
 
             Transform = Matrix4.Identity;
 
@@ -51,8 +51,6 @@ namespace Nephilim.Engine.Util
             Vector3 scale = new Vector3(x, y, z);
 
             Transform = Matrix4.CreateScale(scale);
-
-//          Log.Print($"Scale is {_transform.ExtractScale()} and the file said {scale}.");
 
             x = 0;
             y = 0;
@@ -90,6 +88,7 @@ namespace Nephilim.Engine.Util
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
+
         }
     }
 }

@@ -9,6 +9,9 @@ using System;
 using System.IO;
 using System.Diagnostics;
 
+using Nephilim.Engine.Core;
+using System.Diagnostics.CodeAnalysis;
+
 namespace Nephilim.Engine.Rendering
 {
     public class Texture
@@ -33,15 +36,19 @@ namespace Nephilim.Engine.Rendering
 
         public static Texture GetEmpty()
         {
-            return new Texture(0,0,0);
+            return new Texture(0, 0, 0);
         }
 
+        public void Bind(int slot)
+        {
+            if (_textureID == 0)
+                Log.Print($"{System.IO.Path.GetFileName(Path)} had 0 as ID.");
+            GL.ActiveTexture(TextureUnit.Texture0 + slot);
+            GL.BindTexture(TextureTarget.Texture2D, _textureID);
+        }
         public void Bind()
         {
-            if(_textureID == 0)
-                Log.Print($"{System.IO.Path.GetFileName(Path)} had 0 as ID.");
-            GL.ActiveTexture(TextureUnit.Texture0);
-            GL.BindTexture(TextureTarget.Texture2D, _textureID);
+            Bind(0);
         }
 
         public void Unbind() => GL.BindTexture(TextureTarget.Texture2D, 0);
@@ -95,12 +102,17 @@ namespace Nephilim.Engine.Rendering
             return new Texture(result, imageWidth, imageHeight);
         }
 
-        public static Texture QueTextureLoad(string path)
+        public static Texture QueTextureLoad(byte[] rawData)
         {
-            var image = new Bitmap(path);
-    
+            Bitmap image;
+
+            using (MemoryStream ms = new MemoryStream(rawData))
+            {
+                image = new Bitmap(ms);
+            }
+
             var texture = new Texture(-1, image.Width, image.Height);
-            texture.Path = path;
+            texture.Path = string.Empty;
             IntPtr data = image.LockBits(
                 new Rectangle(
                     0,
@@ -119,7 +131,7 @@ namespace Nephilim.Engine.Rendering
         {
             var sw = Stopwatch.StartNew();
             Log.Print($"{TexturesToLoad.Count} to load.");
-            while(TexturesToLoad.Count > 0)
+            while (TexturesToLoad.Count > 0)
             {
                 if (!TexturesToLoad.TryPop(out var entry))
                     return;
@@ -162,6 +174,27 @@ namespace Nephilim.Engine.Rendering
                     break;
                 }
             }
+        }
+
+        // override object.Equals
+        public override bool Equals(object obj)
+        {
+            if (obj == null || GetType() != obj.GetType())
+            {
+                return false;
+            }
+            
+            return _textureID == ((Texture)obj)._textureID;
+        }
+
+        public static bool operator ==(Texture t1, Texture t2)
+        {
+            return t1.Equals(t2);            
+        }
+
+        public static bool operator !=(Texture t1, Texture t2)
+        {
+            return !t1.Equals(t2);
         }
 
     }

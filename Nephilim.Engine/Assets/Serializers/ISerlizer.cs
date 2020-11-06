@@ -8,6 +8,6 @@ namespace Nephilim.Engine.Assets.Serializers
     {
         T Deserlize<T>(string source);
         object Deserlize(string source);
-        void Serlize(string source);
+        void Serlize(string source, string output);
     }
 }

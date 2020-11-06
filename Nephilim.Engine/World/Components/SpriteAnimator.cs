@@ -88,8 +88,8 @@ namespace Nephilim.Engine.World.Components
 
         public SpriteAnimator(SerializationInfo info, StreamingContext context)
         {
-            var filePath = (string)info.GetValue("AnimationFile", typeof(string));
-            var animations = SpriteAnimation.Deserialize(filePath);
+            var name = (string)info.GetValue("AnimationFile", typeof(string));
+            var animations = SpriteAnimation.Deserialize(name);
             _animations = animations.Animations;
             _sheet = animations.Sheet;
             FrameRate = (float)info.GetValue("FrameRate", typeof(float));

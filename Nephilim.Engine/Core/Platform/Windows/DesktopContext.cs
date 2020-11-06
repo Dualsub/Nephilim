@@ -8,10 +8,14 @@ using OpenTK.Windowing.Common;
 using OpenTK.Mathematics;
 using Nephilim.Engine.Input;
 using Nephilim.Engine.Rendering;
+using System.IO;
+using System.Drawing;
+using OpenTK.Compute.OpenCL;
+using OpenTK.Windowing.Common.Input;
 
 namespace Nephilim.Engine.Core
 {
-    class DesktopContext : GameWindow, IApplicationContext
+    public class DesktopContext : GameWindow, IApplicationContext
     {
 
         Stopwatch _sw = null;
@@ -28,13 +32,46 @@ namespace Nephilim.Engine.Core
         public event System.Action UnLoaded;
         public new event System.Action<int, int> Resize;
 
+        private static NativeWindowSettings _nativeWindowSettings = null;
+        private static GameWindowSettings _gameWindowSettings = null;
+        private static GameWindowSettings GameWindowSettings
+        {
+            get
+            {
+                // Init if it hasen't already been 
+                if (_gameWindowSettings is null)
+                {
+                    _gameWindowSettings = new GameWindowSettings();
+                    //TODO: Enable multithreading
+                    //_gameWindowSettings.IsMultiThreaded = true;
+                }
+
+                return _gameWindowSettings;
+            }
+        }
+
+        private static NativeWindowSettings NativeWindowSettings
+        {
+            get
+            {
+                // Init if it hasen't already been 
+                if (_nativeWindowSettings is null) 
+                {
+                    _nativeWindowSettings = new NativeWindowSettings();
+                    _nativeWindowSettings.Icon = LoadIcon();
+                }
+
+                return _nativeWindowSettings;
+            }
+        }
+
 #if DEBUG
         string title;
         float fpsFreq = 1 / 3f;
         double fpsTimeCache = 0;
 #endif
 
-        public DesktopContext(Configuration gameConfig) : base(GetGameWindowSettings(), GetNativeWindowSettings())
+        public DesktopContext(Configuration gameConfig) : base(GameWindowSettings, NativeWindowSettings)
         {
 #if DEBUG
             title = gameConfig.WindowConfig.Title;
@@ -78,6 +115,30 @@ namespace Nephilim.Engine.Core
                     );
         }
 
+        private static WindowIcon LoadIcon()
+        {
+            string iconPath = UtilFunctions.FindFilePath("NephilimIcon.ico");
+
+            if (string.IsNullOrEmpty(iconPath))
+                return null;
+
+            byte[] iconData; ;
+
+            using(var ms = new MemoryStream())
+            {
+                new Icon(iconPath).Save(ms);
+                ms.Position = 0;
+                iconData = ms.ToArray();
+            }
+
+            if (iconData.Length <= 0)
+                throw new Exception("No icon data.");
+
+            return new WindowIcon(new OpenTK.Windowing.Common.Input.Image[]
+            {
+                new OpenTK.Windowing.Common.Input.Image(256, 256, iconData)
+            });
+        }
 
         public void Init()
         {
@@ -87,6 +148,14 @@ namespace Nephilim.Engine.Core
             Move += Context_Move;
             _sw = new Stopwatch();
             _sw.Start();
+            LoadIcon();
+#if DEBUG
+            Log.Print(GL.GetString(StringName.Vendor));
+            Log.Print(GL.GetString(StringName.Renderer));
+            Log.Print(GL.GetString(StringName.ShadingLanguageVersion));
+            Log.Print(GL.GetString(StringName.Version));
+#endif
+
         }
 
         private void Context_Move(WindowPositionEventArgs obj)
@@ -171,19 +240,6 @@ namespace Nephilim.Engine.Core
             Title = title + $"  FPS: { (uint) (1d / DeltaTime.TotalSeconds) } ms: {DeltaTime.TotalMilliseconds }";
         }
 #endif
-
-        private static GameWindowSettings GetGameWindowSettings()
-        {
-            var gws = new GameWindowSettings();
-            // TODO: Multi-Thread Rendering
-            //gws.IsMultiThreaded = true;
-            return gws;
-        }
-
-        private static NativeWindowSettings GetNativeWindowSettings()
-        {
-            return new NativeWindowSettings();
-        }
 
     }
 }

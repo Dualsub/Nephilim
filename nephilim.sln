@@ -7,9 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nephilim.Sandbox", "Nephili
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nephilim.Engine", "Nephilim.Engine\Nephilim.Engine.csproj", "{C3FC6FED-8DE2-431E-AE93-BF9C39AB758C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nephilim.Editor", "Nephilim.Editor\Nephilim.Editor.csproj", "{3BF591D6-EEEB-4A32-B350-69BC6C4A810E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nephilim.Editor", "Nephilim.Editor\Nephilim.Editor.csproj", "{3BF591D6-EEEB-4A32-B350-69BC6C4A810E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nephilim.BuildTool", "Nephilim.BuildTool\Nephilim.BuildTool.csproj", "{41C401BC-8435-48BD-AAB9-85B675012E04}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nephilim.BuildTool", "Nephilim.BuildTool\Nephilim.BuildTool.csproj", "{41C401BC-8435-48BD-AAB9-85B675012E04}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nephilim.Desktop", "Nephilim.Desktop\Nephilim.Desktop.csproj", "{CC357A71-18D9-434D-9C6A-9B95AB57470E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,6 +71,18 @@ Global
 		{41C401BC-8435-48BD-AAB9-85B675012E04}.Release|x64.Build.0 = Release|Any CPU
 		{41C401BC-8435-48BD-AAB9-85B675012E04}.Release|x86.ActiveCfg = Release|Any CPU
 		{41C401BC-8435-48BD-AAB9-85B675012E04}.Release|x86.Build.0 = Release|Any CPU
+		{CC357A71-18D9-434D-9C6A-9B95AB57470E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC357A71-18D9-434D-9C6A-9B95AB57470E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC357A71-18D9-434D-9C6A-9B95AB57470E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CC357A71-18D9-434D-9C6A-9B95AB57470E}.Debug|x64.Build.0 = Debug|Any CPU
+		{CC357A71-18D9-434D-9C6A-9B95AB57470E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CC357A71-18D9-434D-9C6A-9B95AB57470E}.Debug|x86.Build.0 = Debug|Any CPU
+		{CC357A71-18D9-434D-9C6A-9B95AB57470E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC357A71-18D9-434D-9C6A-9B95AB57470E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC357A71-18D9-434D-9C6A-9B95AB57470E}.Release|x64.ActiveCfg = Release|Any CPU
+		{CC357A71-18D9-434D-9C6A-9B95AB57470E}.Release|x64.Build.0 = Release|Any CPU
+		{CC357A71-18D9-434D-9C6A-9B95AB57470E}.Release|x86.ActiveCfg = Release|Any CPU
+		{CC357A71-18D9-434D-9C6A-9B95AB57470E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

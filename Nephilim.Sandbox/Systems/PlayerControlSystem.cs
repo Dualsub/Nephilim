@@ -41,7 +41,7 @@ namespace Nephilim.Sandbox.Systems
 
                     rigidBody.ApplyForce(netForce * moveComp.Acceleration * (float)dt, new Vector2(0.0f, 0.0f));
 
-                    //transformComp.Scale = new Vector3(-1*Math.Abs(transformComp.Scale.X), transformComp.Scale.Y, 1);
+                    transformComp.Scale = new Vector3(-2, 2, 1);
 
                     if (Math.Abs(rigidBody.Velocity.Y) > 0.01f)
                     {

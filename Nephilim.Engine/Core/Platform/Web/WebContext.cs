@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Nephilim.Engine.Core.Platform.Web
 {
-    class WebContext : IApplicationContext
+    public class WebContext : IApplicationContext
     {
         public double UpdateFrequency => throw new NotImplementedException();
 

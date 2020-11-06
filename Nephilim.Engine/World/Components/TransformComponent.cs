@@ -2,6 +2,7 @@
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
@@ -43,8 +44,7 @@ namespace Nephilim.Engine.World.Components
             get => _transform.ExtractRotation();
             set
             {
-                _transform = _transform.ClearRotation();
-                _transform = Matrix4.CreateFromQuaternion(value) * _transform;
+                _transform = _transform.ClearTranslation() * Matrix4.CreateFromQuaternion(value) * _transform.ClearScale().ClearRotation();
             }
         }
 
@@ -78,12 +78,19 @@ namespace Nephilim.Engine.World.Components
 
         public void SetTransform(Vector2 position, float angle)
         {
-            Log.Print("Before");
-            Log.Print(_transform.ExtractScale());
-            _transform = _transform.ClearRotation() * Matrix4.CreateRotationZ(angle);
-            _transform = _transform.ClearTranslation() * Matrix4.CreateTranslation(position.X, position.Y, _transform.ExtractTranslation().Z);
-            Log.Print("After");
-            Log.Print(_transform.ExtractScale());
+
+            var before = _transform;
+
+            _transform = _transform.ClearRotation().ClearTranslation();
+            _transform = _transform * Matrix4.CreateRotationZ(angle) * Matrix4.CreateTranslation(position.X, position.Y, _transform.ExtractTranslation().Z);
+
+            if (before != _transform)
+            {
+                Log.Print("Scale not the same");
+                Log.Print(_transform);
+                Log.Print(before);
+
+            }
         }
 
         public void SetAngle(float angle)

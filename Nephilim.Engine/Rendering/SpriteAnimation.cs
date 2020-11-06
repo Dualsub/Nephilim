@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Nephilim.Engine.Core;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,17 +16,13 @@ namespace Nephilim.Engine.Rendering
         public SpriteSheet Sheet;
         public Dictionary<string, AnimationFrame> Animations;
 
-        static public SpriteAnimation Deserialize(string path)
+        static public SpriteAnimation Deserialize(string name)
         {
-            var settings = new JsonSerializerSettings();
+            JsonSerializerSettings settings = new JsonSerializerSettings();
+
             settings.Formatting = Formatting.Indented;
 
-            string fileText;
-
-            using (var sr = new StreamReader(path, Encoding.UTF8))
-            {
-                fileText = sr.ReadToEnd();
-            }
+            string fileText = Application.ResourceManager.Load<string>(name);
 
             return JsonConvert.DeserializeObject<SpriteAnimation>(fileText, settings);
         }
@@ -36,7 +33,7 @@ namespace Nephilim.Engine.Rendering
             string path = (string)info.GetValue("SpriteSheet", typeof(string));
             int width = info.GetInt32("CellWidth");
             int height = info.GetInt32("CellHeight");
-            var texture = Texture.QueTextureLoad(path);
+            var texture = Application.ResourceManager.Load<Texture>(path);
             Sheet = new SpriteSheet(texture, width, height);
         }
 

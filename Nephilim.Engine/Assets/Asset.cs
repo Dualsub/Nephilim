@@ -6,28 +6,30 @@ using System.Threading.Tasks;
 
 namespace Nephilim.Engine.Assets
 {
-    struct AssetID
+    struct Asset
     {
         private string _id;
+        private object _data;
 
-        private AssetID(string id)
+        private Asset(string id, object data)
         {
+            _data = data;
             _id = id ?? throw new ArgumentNullException(nameof(id));
         }
 
-        public static bool operator ==(AssetID a1, AssetID a2)
+        public static bool operator ==(Asset a1, Asset a2)
         {
             return a1._id == a2._id;
         }
 
-        public static bool operator !=(AssetID a1, AssetID a2)
+        public static bool operator !=(Asset a1, Asset a2)
         {
             return a1._id != a2._id;
         }
 
         public override bool Equals(object obj)
         {
-            AssetID e = (AssetID)obj;
+            Asset e = (Asset)obj;
 
             return e != default && e._id == _id;
         }
@@ -42,9 +44,9 @@ namespace Nephilim.Engine.Assets
             return base.GetHashCode();
         }
 
-        public static AssetID GenerateID()
+        public static Asset GenerateAsset(object data)
         {
-            return new AssetID(Guid.NewGuid().ToString());
+            return new Asset(Guid.NewGuid().ToString(), data);
         }
     }
 }

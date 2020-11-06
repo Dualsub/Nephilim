@@ -64,13 +64,11 @@ namespace Nephilim.Engine.World.Systems
 					{
 						if (transform.ParentTag != string.Empty)
 							continue;
-						Log.Print("Before");
-						Log.Print(transform.Transform);
+
 						var body = registry.GetComponent<RigidBody2D>(entity);
 						transform.SetTransform(body.Position, body.Angle);
-						Log.Print("After");
-						Log.Print(transform.Transform);
-						if (registry.HasComponent<CameraFollowComponent>(entity) 
+                        
+                        if (registry.HasComponent<CameraFollowComponent>(entity) 
 							&& registry.TryGetSingletonComponent(out OrthoCameraComponent cameraComponent))
 						{
 							cameraComponent.SetPosition(transform.Position);
@@ -151,8 +149,8 @@ namespace Nephilim.Engine.World.Systems
 		private void CreatePhysicsWorld(PhysicsWorld2D physicsWorld)
 		{
 			AABB worldAABB = new AABB();
-			worldAABB.LowerBound.Set(-1000, -1000);
-			worldAABB.UpperBound.Set(1000, 1000);
+			worldAABB.LowerBound.Set(-10000, -10000);
+			worldAABB.UpperBound.Set(10000, 10000);
 			Vec2 gravity = physicsWorld.Gravity;
 			Box2DX.Dynamics.World world = new Box2DX.Dynamics.World(worldAABB, gravity, false);
 			physicsWorld.World = world;

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Nephilim.Engine.Core;
 
 namespace Nephilim.Engine.Rendering
 {
@@ -47,6 +48,11 @@ namespace Nephilim.Engine.Rendering
         internal void SetUniform(string name, bool value)
         {
             GL.Uniform1(GetUniformLocation(name), value ? 1.0f : 0.0f);
+        }
+
+        internal void SetUniform(string name, int[] value)
+        {
+            GL.Uniform1(GetUniformLocation(name), value.Length, value);
         }
 
         public static Shader LoadShader(string file)
@@ -109,7 +115,7 @@ namespace Nephilim.Engine.Rendering
 
         private static string LoadSource(string path)
         {
-            using (var sr = new StreamReader(path, Encoding.UTF8)) return sr.ReadToEnd();
+            return Application.ResourceManager.Load<string>(path);
         }
 
 

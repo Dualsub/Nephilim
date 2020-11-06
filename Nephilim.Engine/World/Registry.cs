@@ -535,11 +535,11 @@ namespace Nephilim.Engine.World
             {
                 try
                 {
-                    CreateEntityFromPrefab(prefab.Path, prefab.Transform);
+                    CreateEntityFromPrefab(prefab.Name, prefab.Transform);
                 }
                 catch (Exception)
                 {
-                    throw new Exception($"There was an error when reading the prefabfile {Path.GetFileNameWithoutExtension(prefab.Path)} in the path:{prefab.Path}.");
+                    throw new Exception($"There was an error when reading the prefabfile {Path.GetFileNameWithoutExtension(prefab.Name)} in the path:{prefab.Name}.");
                 }
             }
 

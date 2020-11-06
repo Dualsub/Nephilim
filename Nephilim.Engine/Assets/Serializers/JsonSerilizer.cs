@@ -19,7 +19,7 @@ namespace Nephilim.Engine.Assets.Serializers
             return JsonConvert.DeserializeObject(source);
         }
 
-        public void Serlize(string source)
+        public void Serlize(string source, string output)
         {
             throw new NotImplementedException();
         }
