@@ -11,7 +11,7 @@ namespace Nephilim.Engine.World.Systems
     class PlayerControlSystem : System
     {
 
-        protected override void OnUpdate(Registry registry, double dt)
+        protected override void OnUpdate(Registry registry, TimeStep ts)
         {
             var entities = registry.GetEntitiesWithComponent<MovementComponent>();
             foreach (var entity in entities)
@@ -37,7 +37,7 @@ namespace Nephilim.Engine.World.Systems
                         netForce += new Vector2(-1, 0);
                     }
 
-                    rigidBody.ApplyForce(netForce * moveComp.Acceleration * (float)dt, new Vector2(0.0f, 0.0f));
+                    rigidBody.ApplyForce(netForce * (moveComp.Acceleration * ts), new Vector2(0.0f, 0.0f));
 
                     if (Math.Abs(rigidBody.Velocity.Y) > 0.1f)
                     {
@@ -46,7 +46,7 @@ namespace Nephilim.Engine.World.Systems
 
                     if (InputManager.IsKeyDown(OpenTK.Windowing.GraphicsLibraryFramework.Keys.Space))
                     {
-                        rigidBody.ApplyForce(Vector2.UnitY * moveComp.JumpAcceleration * (float)dt, new Vector2(0.0f, 0.0f));
+                        rigidBody.ApplyForce(Vector2.UnitY * (moveComp.JumpAcceleration * ts), new Vector2(0.0f, 0.0f));
                     }
 
 

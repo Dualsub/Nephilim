@@ -1,11 +1,12 @@
-﻿using Nephilim.Engine.World.Components;
+﻿using Nephilim.Engine.Core;
+using Nephilim.Engine.World.Components;
 using OpenTK.Mathematics;
 
 namespace Nephilim.Engine.World.Systems
 {
     class ParallaxSystem : System 
     {
-        protected override void OnUpdate(Registry registry, double dt)
+        protected override void OnUpdate(Registry registry, TimeStep ts)
         {
             foreach (var entity in registry.GetEntitiesWithComponent<ParallaxComponent>())
             {

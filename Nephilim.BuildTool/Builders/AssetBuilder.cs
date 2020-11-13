@@ -128,6 +128,11 @@ namespace Nephilim.BuildTool.Builders
             Console.ForegroundColor = color;
         }
 
+        public void GetArgsInfo(ref BuilderArgsInfo builderArgsInfo)
+        {
+            throw new NotImplementedException();
+        }
+
         public void Initilize()
         {
             Console.WriteLine("Beginning assets build...");

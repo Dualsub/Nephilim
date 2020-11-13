@@ -46,6 +46,51 @@ namespace Nephilim.Engine.Rendering
             GL.ActiveTexture(TextureUnit.Texture0 + slot);
             GL.BindTexture(TextureTarget.Texture2D, _textureID);
         }
+
+        internal static Texture LoadTextureUnsafe(Bitmap image)
+        {
+            int result = GL.GenTexture();
+            int imageWidth = 0;
+            int imageHeight = 0;
+            GL.BindTexture(TextureTarget.Texture2D, result);
+
+            BitmapData data = image.LockBits(
+                new Rectangle(
+                    0,
+                    0,
+                    image.Width,
+                    image.Height),
+                ImageLockMode.ReadOnly,
+                System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+
+
+            GL.TexImage2D(
+                TextureTarget.Texture2D,
+                0,
+                PixelInternalFormat.Rgba,
+                image.Width,
+                image.Height,
+                0,
+                OpenTK.Graphics.OpenGL4.PixelFormat.Bgra,
+                PixelType.UnsignedByte,
+                data.Scan0);
+            imageWidth = image.Width;
+            imageHeight = image.Height;
+
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
+
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToBorder);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToBorder);
+
+            GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
+
+            Textures.Add(result);
+
+            return new Texture(result, imageWidth, imageHeight);
+        }
+
         public void Bind()
         {
             Bind(0);

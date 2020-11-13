@@ -3,6 +3,7 @@ using Nephilim.Engine.Rendering;
 using OpenTK.Mathematics;
 using Nephilim.Engine.Core;
 using Nephilim.Engine.Util;
+using System;
 
 namespace Nephilim.Engine.World.Systems
 {
@@ -16,16 +17,11 @@ namespace Nephilim.Engine.World.Systems
             }
         }
 
-        protected override void OnUpdate(Registry registry, double dt)
+        protected override void OnUpdate(Registry registry, TimeStep ts)
         {
             if (registry.TryGetSingletonComponent(out LoadingScreenComponent component))
             {
-                component.TimeSinceLast += (float)dt;
-                if (component.TimeSinceLast > (1f / 10))
-                {
-                    component.CurrentIndex = (component.CurrentIndex + 1) % (component.Frames.Texture.Width / component.Frames.FrameWidth);
-                    component.TimeSinceLast = (1f / 10) - component.TimeSinceLast;
-                }
+                component.Transform = component.Transform.ClearTranslation() * Matrix4.CreateRotationZ(-10f*ts) * component.Transform.ClearScale().ClearRotation();
             }
         }
 
@@ -34,7 +30,7 @@ namespace Nephilim.Engine.World.Systems
             if (registry.TryGetSingletonComponent(out LoadingScreenComponent component))
             {
                 Renderer2D.BeginScene();
-                Renderer2D.DrawQuad(component.Frames.Texture, component.Frames.GetFrameOffset(component.CurrentIndex), component.Transform);
+                Renderer2D.DrawQuad(component.Texture, component.Transform);
                 Renderer2D.EndScene();
             }
         }

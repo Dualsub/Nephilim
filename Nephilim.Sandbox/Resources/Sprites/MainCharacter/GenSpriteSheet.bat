@@ -1,0 +1,2 @@
+C:\dev\csharp\nephilim\Nephilim.BuildTool\bin\Debug\netcoreapp3.1\Nephilim.BuildTool.exe spritesheet C:\dev\csharp\nephilim\Nephilim.Sandbox\Resources\Sprites\MainCharacter C:\dev\csharp\nephilim\Nephilim.Sandbox\Resources\Sprites\MainCharacter\MainCharacterSheet.png gen-anim
+PAUSE

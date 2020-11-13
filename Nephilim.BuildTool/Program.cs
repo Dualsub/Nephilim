@@ -19,6 +19,8 @@ namespace Nephilim.BuildTool
             {"game", typeof(GameBuilder) },
             {"editor", typeof(EditorBuilder) },
             {"assets", typeof(AssetBuilder) },
+            {"bytes", typeof(ByteArrayBuilder) },
+            {"spritesheet", typeof(SpriteSheetBuilder) }
 
         };
 
@@ -39,6 +41,16 @@ namespace Nephilim.BuildTool
             var tempArgs = args.ToList();
             tempArgs.RemoveAt(0);
             args = tempArgs.ToArray();
+
+            if(args.Length > 0 
+            && !string.IsNullOrEmpty(args[0]) 
+            && args[0].ToLower() == "help")
+            {
+                var ba = new BuilderArgsInfo();
+                builder.GetArgsInfo(ref ba);
+                ba.PrintArgInfo();
+                return;
+            }
 
             builder.Initilize();
             builder.ExcecuteBuild(args);

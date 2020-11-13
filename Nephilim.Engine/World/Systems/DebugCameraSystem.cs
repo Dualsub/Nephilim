@@ -1,5 +1,6 @@
 ﻿using Nephilim.Engine.Input;
 using OpenTK.Mathematics;
+using OpenTK.Windowing.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,12 +9,35 @@ using System.Threading.Tasks;
 using Nephilim.Engine.World.Components;
 using Nephilim.Engine.Util;
 using Nephilim.Engine.Rendering;
+using Nephilim.Engine.Core;
 
 namespace Nephilim.Engine.World.Systems
 {
     class DebugCameraSystem : System
     {
-        protected override void OnUpdate(Registry registry, double dt)
+        protected override void OnActivated(Registry registry)
+        {
+            InputManager.KeyDown += (e) =>
+            {
+                if (e.Key == OpenTK.Windowing.GraphicsLibraryFramework.Keys.F1)
+                {
+                    if ((Renderer2D.DebugFlags & DebugRenderingFlags.Colliders) == DebugRenderingFlags.Colliders)
+                        Renderer2D.DebugFlags &= ~DebugRenderingFlags.Colliders;
+                    else
+                        Renderer2D.DebugFlags |= DebugRenderingFlags.Colliders;
+                }
+
+                if (e.Key == OpenTK.Windowing.GraphicsLibraryFramework.Keys.F2)
+                {
+                    if ((Renderer2D.DebugFlags & DebugRenderingFlags.DebugRenderers) == DebugRenderingFlags.DebugRenderers)
+                        Renderer2D.DebugFlags &= ~DebugRenderingFlags.DebugRenderers;
+                    else
+                        Renderer2D.DebugFlags |= DebugRenderingFlags.DebugRenderers;
+                }
+            };
+        }
+
+        protected override void OnUpdate(Registry registry, TimeStep ts)
         {
             if (InputManager.IsKeyDown(OpenTK.Windowing.GraphicsLibraryFramework.Keys.P))
             {
@@ -57,12 +81,12 @@ namespace Nephilim.Engine.World.Systems
 
                 if (InputManager.IsKeyDown(OpenTK.Windowing.GraphicsLibraryFramework.Keys.Q))
                 {
-                    cameraComponent.Zoom += (float)dt * 3;
+                    cameraComponent.Zoom += ts * 3;
                 }
 
                 if (InputManager.IsKeyDown(OpenTK.Windowing.GraphicsLibraryFramework.Keys.E))
                 {
-                    cameraComponent.Zoom -= (float)dt * 3;
+                    cameraComponent.Zoom -= ts * 3;
                 }
 
                 if (InputManager.IsKeyDown(OpenTK.Windowing.GraphicsLibraryFramework.Keys.R))
@@ -70,7 +94,7 @@ namespace Nephilim.Engine.World.Systems
                     cameraComponent.Zoom = 1f;
                 }
 
-                cameraComponent.AddPosition(direction * speedMul * cameraComponent.Zoom * (float)dt * cameraComponent.Speed);
+                cameraComponent.AddPosition(direction * speedMul * cameraComponent.Zoom * ts.DeltaTime * cameraComponent.Speed);
             }
 
         }

@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 
@@ -14,7 +15,6 @@ namespace Nephilim.Engine.Core
 {
     public abstract class Application : IDisposable
     {
-
         private IApplicationContext _appContext = null;
 
         public static float Width { get; private set; } = 0;
@@ -70,11 +70,12 @@ namespace Nephilim.Engine.Core
             Height = y;
         }
 
-        private void WindowDriver_Update(double dt)
+        private void WindowDriver_Update(TimeStep ts)
         {
-            DeltaTime = TimeDilation * dt;
-            Update(DeltaTime);
+            DeltaTime = TimeDilation * ts.DeltaTime;
+            Update(ts);
         }
+
         private void WindowDriver_Render()
         {
             Render();
@@ -111,11 +112,11 @@ namespace Nephilim.Engine.Core
             }
         }
 
-        public void Update(double dt)
+        public void Update(TimeStep ts)
         {
             for (int i = 0; i < _layers.Count; i++)
             {
-                _layers[i].OnUpdateLayer(dt);
+                _layers[i].OnUpdateLayer(ts);
             }
         }
 

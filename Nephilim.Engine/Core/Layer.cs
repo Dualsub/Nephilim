@@ -4,7 +4,7 @@ namespace Nephilim.Engine.Core
 {
     public interface ILayer
     {
-        void OnUpdateLayer(double dt);
+        void OnUpdateLayer(TimeStep ts);
 
         void OnRenderLayer();
         

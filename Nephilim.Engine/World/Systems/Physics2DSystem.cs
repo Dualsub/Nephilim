@@ -6,6 +6,7 @@ using Nephilim.Engine.Core;
 using Nephilim.Engine.World.Components;
 using Nephilim.Engine.Util;
 using OpenTK.Mathematics;
+using System.Collections.Generic;
 
 namespace Nephilim.Engine.World.Systems
 {
@@ -58,12 +59,18 @@ namespace Nephilim.Engine.World.Systems
 			{
 				physicsWorld.World.Step(PhysicsGlobals.TimeStep * Application.TimeDilation, PhysicsWorld2D.VelocityIterations, PhysicsWorld2D.PositionIterations);
 				var entities = registry.GetEntitiesWithComponent<RigidBody2D>();
+
+				var children = new List<EntityID>();
+
 				foreach (var entity in entities)
 				{
 					if (registry.TryGetComponent(entity, out TransformComponent transform))
 					{
 						if (transform.ParentTag != string.Empty)
+                        {
+							children.Add(entity);
 							continue;
+						}
 
 						var body = registry.GetComponent<RigidBody2D>(entity);
 						transform.SetTransform(body.Position, body.Angle);
@@ -76,9 +83,7 @@ namespace Nephilim.Engine.World.Systems
 					}
 				}
 
-				//TODO: 
-
-				foreach (var entity in registry.GetEntitiesWithComponent<TransformComponent>())
+				foreach (var entity in children)
 				{
 					var transform = registry.GetComponent<TransformComponent>(entity);
 					EntityID parent = registry.GetEntityByTag(transform.ParentTag);
@@ -88,7 +93,7 @@ namespace Nephilim.Engine.World.Systems
 						if (registry.TryGetComponent(parent, out TransformComponent parentTransform) 
 						&& !(parentTransform is null))
 						{
-							transform.Transform = transform.DefaultTransform * parentTransform.Transform;
+							transform.SetTransform(transform.DefaultTransform * parentTransform.GetTransform());
 						}
 					}
 				}
@@ -101,8 +106,7 @@ namespace Nephilim.Engine.World.Systems
 			var rigidBody = registry.GetComponent<RigidBody2D>(entity);
 			BodyDef bodyDef = new BodyDef();
 			bodyDef.Position = Util.UtilFunctions.ToVec2(transform.Position / PhysicsWorld2D.PixelToMeter);
-			transform.Rotation.ToAxisAngle(out var axis, out var angle);
-			bodyDef.Angle = axis.Z * angle;
+			bodyDef.Angle = transform.Rotation.Z;
 			bodyDef.AngularDamping = rigidBody.AngularDamping;
 			bodyDef.LinearDamping = rigidBody.LinearDamping;
 			bodyDef.FixedRotation = rigidBody.FixedRotation;

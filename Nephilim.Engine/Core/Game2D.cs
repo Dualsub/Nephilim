@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -32,10 +33,12 @@ namespace Nephilim.Engine.Core
         private Entity _loadingScreenCamera;
 
         private string _defaultScene;
+        private Bitmap _loadingScreen;
 
-        public Game2D(string defaultScene = "DefaultScene")
+        public Game2D(string defaultScene, Bitmap loadingScreen)
         {
-            _defaultScene = defaultScene;
+            _defaultScene = string.IsNullOrEmpty(defaultScene) ? "DefaultScene" : defaultScene;
+            _loadingScreen = loadingScreen;
         }
 
         public void OnAdded()
@@ -47,10 +50,10 @@ namespace Nephilim.Engine.Core
         {
             _loadingEntity = _registry.CreateAbstractEntity();
             var component = new LoadingScreenComponent();
-            component.Frames = new SpriteSheet(Application.ResourceManager.Load<Texture>("Frames"), 220, 50);
-            component.Transform *= Matrix4.CreateScale(1, 1f / 4.4f, 1);
+            component.Texture = Texture.LoadTextureUnsafe(_loadingScreen);
+            component.Transform *= Matrix4.CreateScale(0.64f, 0.64f, 1);
             component.Transform *= Matrix4.CreateFromAxisAngle(new Vector3(1), 0);
-            component.Transform *= Matrix4.CreateTranslation(0, 0, 0);
+            component.Transform *= Matrix4.CreateTranslation(Application.Width * 3f / 10f, -Application.Height * 3f / 10f, 0);
             _ =_registry.AddSingletonComponent(_loadingEntity, component);
             _registry.AddSystem<LoadingScreenSystem>(World.System.UpdateFlags.Update | World.System.UpdateFlags.Render);
 
@@ -89,26 +92,23 @@ namespace Nephilim.Engine.Core
                 _registry.AddSystem<ParallaxSystem>(World.System.UpdateFlags.Update);
                 _registry.AddSystem<Physics2DSystem>(World.System.UpdateFlags.FixedUpdate | World.System.UpdateFlags.EntitySpawned | World.System.UpdateFlags.EntityDestroyed);
                 _registry.AddSystem<CameraShakeSystem>(World.System.UpdateFlags.Update);
-                //_registry.AddSystem<LifeTimeSystem>(World.System.UpdateFlags.Update);
-                //_registry.AddSystem<EnemySystem>(World.System.UpdateFlags.FixedUpdate | World.System.UpdateFlags.Update);
-                //_registry.AddSystem<WeaponSystem>(World.System.UpdateFlags.FixedUpdate);
+                _registry.AddSystem<LifeTimeSystem>(World.System.UpdateFlags.Update);
                 _registry.AddSystem<TransformSystem>(World.System.UpdateFlags.EntitySpawned);
                 _registry.AddSystem<SpriteRenderSystem>(World.System.UpdateFlags.Render);
-
 #if DEBUG
                 _registry.AddSystem<ConsoleSystem>(World.System.UpdateFlags.LateUpdate);
                 _registry.AddSystem<DebugCameraSystem>(World.System.UpdateFlags.Update);
-                //_registry.AddSystem<ColliderDebugSystem>(World.System.UpdateFlags.Render);
+                _registry.AddSystem<ColliderDebugSystem>(World.System.UpdateFlags.Render);
 #endif
                 _registry.ActivateSystems();
             }
         }
 
-        public void OnUpdateLayer(double dt)
+        public void OnUpdateLayer(TimeStep ts)
         {
-            _registry.UpdateSystems(dt);
+            _registry.UpdateSystems(ts);
 
-            _fixedUpdateTime += dt;
+            _fixedUpdateTime += ts.DeltaTime;
 
             if(_fixedUpdateTime >= PhysicsGlobals.TimeStep)
             {

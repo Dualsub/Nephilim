@@ -23,11 +23,11 @@ namespace Nephilim.Engine.Core
             }
         }
 
-        public void Update(double dt)
+        public void Update(TimeStep ts)
         {
             for(int i = 0; i < _layers.Count; i++)
             {
-                _layers[i].OnUpdateLayer(dt);
+                _layers[i].OnUpdateLayer(ts);
             }
         }
 

@@ -11,6 +11,10 @@ namespace Nephilim.BuildTool.Builders
         {
         }
 
+        public void GetArgsInfo(ref BuilderArgsInfo builderArgsInfo)
+        {
+        }
+
         public void Initilize()
         {
             Console.WriteLine("Initlizing Editor Build.");

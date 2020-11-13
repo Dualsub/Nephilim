@@ -1,4 +1,5 @@
 ﻿using Nephilim.Engine.Assets;
+using Nephilim.Engine.Core;
 using Nephilim.Engine.Util;
 using Nephilim.Engine.World.Components;
 using Newtonsoft.Json;
@@ -183,12 +184,12 @@ namespace Nephilim.Engine.World
             }
         }
 
-        internal void UpdateSystems(double dt)
+        internal void UpdateSystems(TimeStep ts)
         {
             for (int i = 0; i < _systems.Count; i++)
             {
                 if ((_systems[i].Item1 & System.UpdateFlags.Update) == System.UpdateFlags.Update && _systems[i].Item2.IsActive)
-                    _systems[i].Item2.Update(this, dt);
+                    _systems[i].Item2.Update(this, ts);
             }
         }
 
@@ -227,7 +228,7 @@ namespace Nephilim.Engine.World
                 if (comp is TransformComponent && offset != default)
                 {
                     var transform = comp as TransformComponent;
-                    transform.Transform *= offset;
+                    transform.SetTransform(transform.GetTransform() * offset);
                 }
                 AddComponent(newEntity, componentType, comp);
             }
@@ -412,10 +413,15 @@ namespace Nephilim.Engine.World
 
         public T GetComponent<T>(EntityID entityID) where T : IComponent
         {
-            if (_components.TryGetValue(typeof(T), out Dictionary<EntityID, IComponent> archetype))
+            return (T)GetComponent(typeof(T), entityID);
+        }
+
+        public object GetComponent(Type type, EntityID entityID)
+        {
+            if (_components.TryGetValue(type, out Dictionary<EntityID, IComponent> archetype))
             {
                 archetype.TryGetValue(entityID, out IComponent component);
-                return (T)component;
+                return component;
             }
             return default;
         }

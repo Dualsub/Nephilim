@@ -1,31 +1,43 @@
 ﻿using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using OpenTK.Windowing.Desktop;
+using System;
+using OpenTK.Windowing.Common;
+using Nephilim.Engine.Core;
 
 namespace Nephilim.Engine.Input
 {
     public static class InputManager
     {
-        private static GameWindow _driver = null;
+        private static IApplicationContext _driver = null;
+        public static Action<KeyboardKeyEventArgs> KeyDown;
+        public static Action<KeyboardKeyEventArgs> KeyUp;
 
-        public static void Init(GameWindow gw)
+
+        public static void Init(IApplicationContext driver)
         {
-            _driver = gw;
+            _driver = driver;
+            _driver.KeyDownEvent += (e) =>
+            {
+                if (KeyDown is null || e.Equals(default))
+                    return;    
+                KeyDown.Invoke(e);
+            };
+            _driver.KeyUpEvent += (e) =>
+            {
+                if (KeyUp is null || e.Equals(default))
+                    return;
+                KeyUp.Invoke(e);
+            };
+
         }
 
-        public static bool IsKeyDown(Keys key)
-        {
-            return _driver.IsAnyKeyDown ? _driver.IsKeyDown(key) : false;
-        }
+        public static bool IsKeyDown(Keys key) => _driver.IsKeyPressed(key);
 
-        public static bool IsMouseButtonDown(MouseButton button)
-        {
-            return _driver.IsAnyMouseButtonDown ? _driver.IsMouseButtonDown(button) : false;
-        }
+        public static bool IsMouseButtonDown(MouseButton button) =>  _driver.IsMouseButtonPressed(button);
 
-        public static Vector2 GetMousePosition()
-        {
-            return _driver.MousePosition;
-        }
+        public static Vector2 GetMousePosition() => _driver.GetMousePosition();
+
+
     }
 }

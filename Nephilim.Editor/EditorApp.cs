@@ -29,7 +29,7 @@ namespace Nephilim.Editor
         {
         }
 
-        public void OnUpdateLayer(double dt)
+        public void OnUpdateLayer(TimeStep ts)
         {
         }
     }

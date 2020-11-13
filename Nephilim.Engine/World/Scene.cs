@@ -114,9 +114,9 @@ namespace Nephilim.Engine.World
                 IComponent comp = (IComponent)((JObject)component.Value).ToObject(componentType);
                 if (comp is TransformComponent && serializedPrefab.Transform != default)
                 {
-                    var transform = comp as TransformComponent;
-                    transform.Transform *= serializedPrefab.Transform;
-                    entityTransform = transform.Transform;
+                    var transformComp = comp as TransformComponent;
+                    var transform = transformComp.GetTransform() * serializedPrefab.Transform;
+                    entityTransform = transform;
                 }
                 entityData.Components.Add(new Tuple<Type, IComponent>(componentType, comp));
             }

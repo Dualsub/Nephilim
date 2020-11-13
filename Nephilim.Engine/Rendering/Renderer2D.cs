@@ -21,6 +21,7 @@ namespace Nephilim.Engine.Rendering
         //private static BatchData _data;
         #endregion
 
+        public static DebugRenderingFlags DebugFlags { get; set; } = DebugRenderingFlags.DebugRenderers;
         private static Color4 _defaultClearColor = new Color4(0.1f,0.1f, 0.1f, 1.0f);
         private static Shader _shader;
         private static ICamera _camera;
@@ -64,6 +65,13 @@ namespace Nephilim.Engine.Rendering
             Quad.BindQuad();
         }
 
+        public static void DrawWireFrameQuad(Vector4 color, Matrix4 transform)
+        {
+            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
+            DrawQuad(color, transform);
+            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
+        }
+
         public static void DrawQuad(Vector4 color, Matrix4 transform)
         {
             if (!HasCamera)
@@ -74,6 +82,7 @@ namespace Nephilim.Engine.Rendering
             _shader.SetUniform("color", color);
             GL.DrawElements(PrimitiveType.Triangles, Quad.Count, DrawElementsType.UnsignedInt, 0);
         }
+
 
         public static void DrawQuad(Texture texture, Matrix4 transform)
         {
@@ -92,7 +101,6 @@ namespace Nephilim.Engine.Rendering
             if (!HasCamera)
                 return;
             _shader.SetUniform("transformationMatrix", transform);
-            //Log.Print(transform.ExtractScale());
             _shader.SetUniform("useTextureOffset", true);
             _shader.SetUniform("textureOffset", textureOffset);
             _shader.SetUniform("useColorOnly", false);

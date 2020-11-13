@@ -105,7 +105,11 @@ namespace Nephilim.Engine.Core
             {
                 config.WindowConfig = new WindowConfig("Nephilim",
                 1600, 900,
+#if DEBUG
                 WindowConfig.WindowState.Windowed,
+#elif RELEASE
+                WindowConfig.WindowState.Fullscreen,
+#endif
                 WindowConfig.FrameLimitType.Unlimited);
             }
 

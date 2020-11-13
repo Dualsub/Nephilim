@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using Nephilim.Engine.World;
+using OpenTK.Mathematics;
+using OpenTK.Windowing.Common;
+using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace Nephilim.Engine.Core
 {
@@ -20,11 +18,19 @@ namespace Nephilim.Engine.Core
         Tuple<int, int> GetViewportSize();
 
         event Action Render;
-        event Action<double> Update;
+        event Action<TimeStep> Update;
 
         event Action Loaded;
         event Action UnLoaded;
 
         event Action<int, int> Resize;
+
+        // Input
+
+        event Action<KeyboardKeyEventArgs> KeyDownEvent;
+        event Action<KeyboardKeyEventArgs> KeyUpEvent;
+        public bool IsKeyPressed(Keys key);
+        public bool IsMouseButtonPressed(MouseButton button);
+        public Vector2 GetMousePosition();
     }
 }

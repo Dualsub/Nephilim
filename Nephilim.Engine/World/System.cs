@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Nephilim.Engine.Core;
 
 namespace Nephilim.Engine.World
 {
@@ -86,10 +87,10 @@ namespace Nephilim.Engine.World
             OnDeactivated(registry);
         }
 
-        internal void Update(Registry registry, double dt)
+        internal void Update(Registry registry, TimeStep ts)
         {
             var sw = Stopwatch.StartNew();
-            OnUpdate(registry, dt);
+            OnUpdate(registry, ts);
             sw.Stop();
         }
 
@@ -127,7 +128,7 @@ namespace Nephilim.Engine.World
         //Interface
         virtual protected void OnActivated(Registry registry) { }
         virtual protected void OnDeactivated(Registry registry) { }
-        virtual protected void OnUpdate(Registry registry, double dt) { }
+        virtual protected void OnUpdate(Registry registry, TimeStep ts) { }
         virtual protected void OnFixedUpdate(Registry registry) { }
         virtual protected void OnLateUpdate(Registry registry) { }
         virtual protected void OnRender(Registry registry) { }

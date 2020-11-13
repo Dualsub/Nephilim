@@ -17,7 +17,13 @@ namespace Nephilim.BuildTool.Builders
             Process.Start("C:/dev/csharp/nephilim/Nephilim.BuildTool/bin/Debug/netcoreapp3.1/Nephilim.BuildTool.exe", $"assets C:/dev/csharp/nephilim/Nephilim.Sandbox/Resources {resourceDir}");
             Process.Start("C:/Program Files/dotnet/dotnet.exe", $"build -c Release -o {buildDirectory + "/bin"} C:/dev/csharp/nephilim/Nephilim.Desktop/");
         }
-    
+
+        public void GetArgsInfo(ref BuilderArgsInfo builderArgsInfo)
+        {
+
+        }
+
+
         public void Initilize()
         {
             Console.WriteLine("Initlizing Game Build.");

@@ -13,90 +13,71 @@ namespace Nephilim.Engine.World.Components
     [Serializable]
     public class TransformComponent : IComponent, ISerializable
     {
-        private Matrix4 _transform;
+
+        private Vector3 _position;
+        private Vector3 _rotation;
+        private Vector3 _scale;
+
         private Matrix4 _defaultTransform;
         private string _parentTag = string.Empty;
         private List<EntityID> _children = new List<EntityID>();
 
         public string ParentTag { get => _parentTag; set => _parentTag = value; }
         public IEnumerable<EntityID> Children { get => _children; }
-        public Matrix4 Transform { get => _transform; set => _transform = value; }
+        
         public Matrix4 DefaultTransform { get => _defaultTransform; set => _defaultTransform = value; }
         public Vector3 Position
         {
-            get => _transform.ExtractTranslation();
-
-            set
-            {
-                _transform = _transform.ClearTranslation() * Matrix4.CreateTranslation(value);
-            }
-        }
-        public Vector3 Scale 
-        { 
-            get => _transform.ExtractScale();
-            set
-            {
-                _transform =  Matrix4.CreateScale(value) * _transform.ClearScale();
-            }
-        }
-        public Quaternion Rotation 
-        { 
-            get => _transform.ExtractRotation();
-            set
-            {
-                _transform = _transform.ClearTranslation() * Matrix4.CreateFromQuaternion(value) * _transform.ClearScale().ClearRotation();
-            }
+            get => _position; set => _position = value;
         }
 
-        //public TransformComponent(Vector3 position)
-        //{
-        //    _transform = transform;
-        //}
+        public Vector3 Scale
+        {
+            get => _scale; set => _scale = value;
+        }
 
-        //public TransformComponent(Vector3 position, Quaternion rotation)
-        //{
-        //    _transform = transform;
-        //}
+        public Vector3 Rotation 
+        {
+            get => _rotation; set => _rotation = value;
+        }
 
         public TransformComponent(Vector3 position, Quaternion rotation, Vector3 scale)
         {
-            Matrix4 transform = Matrix4.Identity;
-
-            transform *= Matrix4.CreateScale(scale);
-            transform *= Matrix4.CreateTranslation(position);
-            transform *= Matrix4.CreateFromQuaternion(rotation);
-
-            _transform = transform;
+            _scale = scale;
+            _rotation = rotation.ToEulerAngles();
+            _position = position;
         }
 
         public TransformComponent(Matrix4 transform)
         {
-            _transform = transform;
+            _scale = transform.ExtractScale();
+            _rotation = transform.ExtractRotation().ToEulerAngles();
+            _position = transform.ExtractTranslation();
         }
 
-        public void SetTransform(Matrix4 transform) => _transform = transform;
+        public void SetTransform(Matrix4 transform) 
+        {
+            
+        }
+
+        public Matrix4 GetTransform()
+        {
+            var transform = Matrix4.Identity;
+            transform *= Matrix4.CreateScale(_scale);
+            transform *= Matrix4.CreateFromQuaternion(Quaternion.FromEulerAngles(_rotation));
+            transform *= Matrix4.CreateTranslation(_position);
+            return transform;
+        }
 
         public void SetTransform(Vector2 position, float angle)
         {
-
-            var before = _transform;
-
-            _transform = _transform.ClearRotation().ClearTranslation();
-            _transform = _transform * Matrix4.CreateRotationZ(angle) * Matrix4.CreateTranslation(position.X, position.Y, _transform.ExtractTranslation().Z);
-
-            if (before != _transform)
-            {
-                Log.Print("Scale not the same");
-                Log.Print(_transform);
-                Log.Print(before);
-
-            }
+            _position = new Vector3(position);
+            SetAngle(angle);
         }
 
         public void SetAngle(float angle)
         {
-            _transform = _transform.ClearRotation();
-            _transform *= Matrix4.CreateRotationZ(angle);
+            _rotation.Z = angle;
         }
 
         public void AddChild(EntityID childEntity)
@@ -105,8 +86,6 @@ namespace Nephilim.Engine.World.Components
         }
         public TransformComponent(SerializationInfo info, StreamingContext context)
         {
-            _transform = Matrix4.Identity;
-
             float x = 1, y = 1, z = 1;
 
             try
@@ -119,9 +98,7 @@ namespace Nephilim.Engine.World.Components
             catch { }
 
             
-            Vector3 scale = new Vector3(x, y, z);
-
-            _transform  = Matrix4.CreateScale(scale) * _transform;
+             _scale = new Vector3(x, y, z);
 
 //          Log.Print($"Scale is {_transform.ExtractScale()} and the file said {scale}.");
 
@@ -138,7 +115,7 @@ namespace Nephilim.Engine.World.Components
 
             } catch { }
 
-            _transform *= Matrix4.CreateFromQuaternion(Quaternion.FromEulerAngles(x, y, z));
+            _rotation = new Vector3(x, y, z);
 
             x = 0;
             y = 0;
@@ -153,9 +130,9 @@ namespace Nephilim.Engine.World.Components
             }
             catch { }
 
-            _transform *= Matrix4.CreateTranslation(x,y,z);
+            _position = new Vector3(x,y,z);
 
-            _defaultTransform = _transform;
+            _defaultTransform = GetTransform();
 
             try
             {
@@ -169,18 +146,23 @@ namespace Nephilim.Engine.World.Components
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            info.AddValue("Position.X", Position.X);
-            info.AddValue("Position.Y", Position.Y);
-            info.AddValue("Position.Z", Position.Z);
+            info.AddValue("position", new Dictionary<string, float> {
+                {"x", _position.X },
+                {"y", _position.Y },
+                {"z", _position.Z }
+            });
 
-            Rotation.ToAxisAngle(out var axis, out var angle);
-            info.AddValue("Rotation.X", MathHelper.RadiansToDegrees(axis.X * angle));
-            info.AddValue("Rotation.Y", MathHelper.RadiansToDegrees(axis.Y * angle));
-            info.AddValue("Rotation.Z", MathHelper.RadiansToDegrees(axis.Z * angle));
+            info.AddValue("rotation", new Dictionary<string, float> {
+                {"x", MathHelper.RadiansToDegrees(_rotation.X) },
+                {"y", MathHelper.RadiansToDegrees(_rotation.Y) },
+                {"z", MathHelper.RadiansToDegrees(_rotation.Z) }
+            });
 
-            info.AddValue("Scale.X", Scale.X);
-            info.AddValue("Scale.Y", Scale.Y);
-            info.AddValue("Scale.Z", Scale.Z);
+            info.AddValue("scale", new Dictionary<string, float> {
+                {"x", _position.X },
+                {"y", _position.Y },
+                {"z", _position.Z }
+            });
         }
     }
 }

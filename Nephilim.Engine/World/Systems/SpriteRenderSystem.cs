@@ -30,9 +30,8 @@ namespace Nephilim.Engine.World.Systems
                 if(registry.TryGetComponent<TransformComponent>(entity, out var transformComponent))
                 {
                     var spriteComp = registry.GetComponent<SpriteRenderer>(entity);
-                    Renderer2D.DrawQuad(spriteComp.Texture, transformComponent.Transform);
+                    Renderer2D.DrawQuad(spriteComp.Texture, transformComponent.GetTransform());
                 }
-
             }
 
             var animatedEntities = registry.GetEntitiesWithComponent<SpriteAnimator>();
@@ -49,28 +48,49 @@ namespace Nephilim.Engine.World.Systems
                         spriteComp.AddToCurrentFrame((int)(spriteComp.TimeCache / timeBetweenFrames));
                         spriteComp.TimeCache = 0;
                     }
-                    Renderer2D.DrawQuad(spriteComp.Texture, spriteComp.TextureOffset, transformComponent.Transform);
+                    Renderer2D.DrawQuad(spriteComp.Texture, spriteComp.TextureOffset, transformComponent.GetTransform());
                 }
 
             }
 #if DEBUG
-            var debugEntities = registry.GetEntitiesWithComponent<DebugRenderer>();
-
-            foreach (var entity in debugEntities)
+            if ((Renderer2D.DebugFlags & DebugRenderingFlags.DebugRenderers) == DebugRenderingFlags.DebugRenderers)
             {
-                if (registry.TryGetComponent<TransformComponent>(entity, out var transformComponent) && 
-                    registry.TryGetComponent(entity, out BoxCollider boxCollider)) 
+                var debugEntities = registry.GetEntitiesWithComponent<DebugRenderer>();
+
+                foreach (var entity in debugEntities)
                 {
-                    Matrix4 renderTransform = Matrix4.Identity;
-                    renderTransform *= Matrix4.CreateScale(boxCollider.Width / Quad.DefaultSize, boxCollider.Height / Quad.DefaultSize, 1);
-                    renderTransform *= Matrix4.CreateFromQuaternion(transformComponent.Rotation);
-                    renderTransform *= Matrix4.CreateTranslation(transformComponent.Position);
-                    Renderer2D.DrawQuad(registry.GetComponent<DebugRenderer>(entity).Color, renderTransform);
+                    if (registry.TryGetComponent<TransformComponent>(entity, out var transformComponent) &&
+                        registry.TryGetComponent(entity, out BoxCollider boxCollider))
+                    {
+                        Matrix4 renderTransform = Matrix4.Identity;
+                        renderTransform *= Matrix4.CreateScale(boxCollider.Width / Quad.DefaultSize, boxCollider.Height / Quad.DefaultSize, 1);
+                        renderTransform *= Matrix4.CreateFromQuaternion(Quaternion.FromEulerAngles(transformComponent.Rotation));
+                        renderTransform *= Matrix4.CreateTranslation(transformComponent.Position);
+                        Renderer2D.DrawQuad(registry.GetComponent<DebugRenderer>(entity).Color, renderTransform);
+                    }
+
                 }
-
             }
-#endif
 
+            if((Renderer2D.DebugFlags & DebugRenderingFlags.Colliders) == DebugRenderingFlags.Colliders)
+            {
+                var entities = registry.GetEntitiesWithComponent<RigidBody2D>();
+                foreach (var entity in entities)
+                {
+                    if (registry.TryGetComponent(entity, out TransformComponent transformComponent) &&
+                        registry.TryGetComponent(entity, out BoxCollider boxCollider))
+                    {
+                        var rigidBody = registry.GetComponent<RigidBody2D>(entity);
+                        Matrix4 renderTransform = Matrix4.Identity;
+                        renderTransform *= Matrix4.CreateScale(boxCollider.Width / Quad.DefaultSize, boxCollider.Height / Quad.DefaultSize, 1);
+                        renderTransform *= Matrix4.CreateFromQuaternion(Quaternion.FromEulerAngles(transformComponent.Rotation));
+                        renderTransform *= Matrix4.CreateTranslation(transformComponent.Position.X, transformComponent.Position.Y, 10);
+                        Renderer2D.DrawWireFrameQuad(new Vector4(0, 1, 0, 0.5f), renderTransform);
+                    }
+                }
+            }
+
+#endif
             Renderer2D.EndScene();
         }
 

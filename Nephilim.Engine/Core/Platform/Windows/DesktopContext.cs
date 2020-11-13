@@ -12,6 +12,8 @@ using System.IO;
 using System.Drawing;
 using OpenTK.Compute.OpenCL;
 using OpenTK.Windowing.Common.Input;
+using System.Linq;
+using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace Nephilim.Engine.Core
 {
@@ -27,10 +29,13 @@ namespace Nephilim.Engine.Core
         public float WindowHeight { get => Size.Y; }
 
         public event System.Action Render;
-        public event System.Action<double> Update;
+        public event System.Action<TimeStep> Update;
         public event System.Action Loaded;
         public event System.Action UnLoaded;
         public new event System.Action<int, int> Resize;
+
+        public event Action<KeyboardKeyEventArgs> KeyDownEvent;
+        public event Action<KeyboardKeyEventArgs> KeyUpEvent;
 
         private static NativeWindowSettings _nativeWindowSettings = null;
         private static GameWindowSettings _gameWindowSettings = null;
@@ -38,7 +43,7 @@ namespace Nephilim.Engine.Core
         {
             get
             {
-                // Init if it hasen't already been 
+                // Init if it hasn't already been 
                 if (_gameWindowSettings is null)
                 {
                     _gameWindowSettings = new GameWindowSettings();
@@ -54,7 +59,7 @@ namespace Nephilim.Engine.Core
         {
             get
             {
-                // Init if it hasen't already been 
+                // Init if it hasn't already been 
                 if (_nativeWindowSettings is null) 
                 {
                     _nativeWindowSettings = new NativeWindowSettings();
@@ -113,21 +118,30 @@ namespace Nephilim.Engine.Core
                     (int)gameConfig.WindowConfig.Width, 
                     (int)gameConfig.WindowConfig.Height
                     );
+
+            LoadInputEvents();
+        }
+
+        private void LoadInputEvents()
+        {
+            KeyDown += (e) => KeyDownEvent.Invoke(e); 
+            KeyUp += (e) => KeyUpEvent.Invoke(e); 
         }
 
         private static WindowIcon LoadIcon()
         {
-            string iconPath = UtilFunctions.FindFilePath("NephilimIcon.ico");
+            string iconPath = UtilFunctions.FindFilePath("NephilimIconImage.png");
 
             if (string.IsNullOrEmpty(iconPath))
                 return null;
 
-            byte[] iconData; ;
+            byte[] iconData;
 
             using(var ms = new MemoryStream())
             {
-                new Icon(iconPath).Save(ms);
+                var bm = Bitmap.FromFile(iconPath, true);
                 ms.Position = 0;
+                bm.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
                 iconData = ms.ToArray();
             }
 
@@ -136,7 +150,7 @@ namespace Nephilim.Engine.Core
 
             return new WindowIcon(new OpenTK.Windowing.Common.Input.Image[]
             {
-                new OpenTK.Windowing.Common.Input.Image(256, 256, iconData)
+                new OpenTK.Windowing.Common.Input.Image(128, 128, iconData)
             });
         }
 
@@ -214,7 +228,7 @@ namespace Nephilim.Engine.Core
         {
             _sw.Restart();
             if (this.IsFocused)
-                Update.Invoke(DeltaTime.TotalSeconds);
+                Update.Invoke(new TimeStep(DeltaTime));
 #if DEBUG
             fpsTimeCache += DeltaTime.TotalSeconds;
             if (fpsTimeCache > fpsFreq)
@@ -240,6 +254,21 @@ namespace Nephilim.Engine.Core
             Title = title + $"  FPS: { (uint) (1d / DeltaTime.TotalSeconds) } ms: {DeltaTime.TotalMilliseconds }";
         }
 #endif
+
+        new public bool IsKeyPressed(Keys key)
+        {
+            return IsAnyKeyDown ? IsKeyDown(key) : false;
+        }
+
+        new public bool IsMouseButtonPressed(MouseButton button)
+        {
+            return IsAnyMouseButtonDown ? IsMouseButtonDown(button) : false;
+        }
+
+        public Vector2 GetMousePosition()
+        {
+            return MousePosition;
+        }
 
     }
 }

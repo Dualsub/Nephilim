@@ -6,13 +6,16 @@ using OpenTK.Mathematics;
 using System;
 using Nephilim.Sandbox.Components;
 using OpenTK.Graphics.ES11;
+using System.Diagnostics;
+using System.Linq;
+using Nephilim.Engine.Core;
 
 namespace Nephilim.Sandbox.Systems
 {
     class PlayerControlSystem : Nephilim.Engine.World.System
     {
 
-        protected override void OnUpdate(Registry registry, double dt)
+        protected override void OnUpdate(Registry registry, TimeStep ts)
         {
             var entities = registry.GetEntitiesWithComponent<MovementComponent>();
             foreach (var entity in entities)
@@ -28,24 +31,31 @@ namespace Nephilim.Sandbox.Systems
                 && registry.TryGetComponent(entity, out SpriteAnimator animator)
                 && registry.TryGetComponent(entity, out TransformComponent transformComp))
                 {
+
                     var moveComp = registry.GetComponent<MovementComponent>(entity);
-                    Vector2 netForce = new Vector2(0, 0);
+                    Vector2 direction = new Vector2(0, 0);
                     if (InputManager.IsKeyDown(OpenTK.Windowing.GraphicsLibraryFramework.Keys.D))
                     {
-                        netForce += new Vector2(1, 0);
+                        direction += new Vector2(1, 0);
                     }
                     if (InputManager.IsKeyDown(OpenTK.Windowing.GraphicsLibraryFramework.Keys.A))
                     {
-                        netForce += new Vector2(-1, 0);
+                        direction += new Vector2(-1, 0);
+                    }
+                    if(Math.Abs(rigidBody.Velocity.X) > 0.05f)
+                    {
+                        transformComp.Scale = new Vector3(
+                            (rigidBody.Velocity.X >= 0 ? 1 : -1) * Math.Abs(transformComp.Scale.X), 
+                            transformComp.Scale.Y, 
+                            transformComp.Scale.Z
+                            );
                     }
 
-                    rigidBody.ApplyForce(netForce * moveComp.Acceleration * (float)dt, new Vector2(0.0f, 0.0f));
-
-                    transformComp.Scale = new Vector3(-2, 2, 1);
+                    rigidBody.Velocity = new Vector2((direction * moveComp.MaxSpeed).X, rigidBody.Velocity.Y);
 
                     if (Math.Abs(rigidBody.Velocity.Y) > 0.01f)
                     {
-                        animator.SetAnimation(rigidBody.Velocity.Y >= 0 ? "Jump" : "Fall", true);
+                        //animator.SetAnimation(rigidBody.Velocity.Y >= 0 ? "Jump" : "Fall", true);
                         continue;
                     }
 

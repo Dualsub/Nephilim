@@ -9,5 +9,6 @@ namespace Nephilim.BuildTool.Builders
     {
         void Initilize();
         void ExcecuteBuild(string[] args);
+        void GetArgsInfo(ref BuilderArgsInfo builderArgsInfo);
     }
 }
