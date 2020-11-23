@@ -1,0 +1,50 @@
+{
+  "TransformComponent": {
+    "position": {
+      "x": 0.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+
+    "rotation": {
+      "x": 0.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+
+    "scale": {
+      "x": 0.5,
+      "y": 0.5,
+      "z": 1.0
+    }
+  },
+  "TagComponent": {
+    "Tag": "Enemy"
+  },
+  "HealthComponent": {
+    "BaseHealth": 100.0
+  },
+  "ShakePlayer": {
+    "ShakeRadius": 1.5,
+    "FallOff": 4000,
+    "Frequency": 20
+  },
+  "SpriteAnimator": {
+    "AnimationFile": "MainCharacterSheet",
+    "DefaultAnimation": "Idle",
+    "FrameRate": 12.0
+  },
+  "BoxCollider": {
+    "Width": 40.0,
+    "Height": 108.0
+  },
+  "RigidBody2D": {
+    "Density": 2.0,
+    "LinearDamping": 0.0,
+    "AngularDamping": 2.0,
+    "Friction": 10.0,
+    "Restitution": 0.0,
+    "FixedRotation": true,
+    "RegisterContacts": true
+  }
+}

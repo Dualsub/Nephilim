@@ -3,6 +3,8 @@ using OpenTK.Mathematics;
 using Nephilim.Engine.Util;
 using Box2DX.Common;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using Nephilim.Engine.Physics;
 
 namespace Nephilim.Engine.World.Components
 {
@@ -33,7 +35,8 @@ namespace Nephilim.Engine.World.Components
         [JsonIgnore]
         public Body Body { get => _body; }
 
-
+        [JsonIgnore]
+        public List<EntityContact> Contacts { get; set; } = new List<EntityContact>();
         public float Density { get; } = 0;
         public float LinearDamping { get; } = 0;
 
@@ -42,6 +45,7 @@ namespace Nephilim.Engine.World.Components
         public float Restitution { get; } = 1;
         public bool FixedRotation { get; } = true;
         public bool IsBullet { get; } = false;
+        public bool RegisterContacts { get; } = true;
         public int Mass { get; } = 0;
         internal Vector2 StartVelocity { get; set; } = Vector2.Zero;
 

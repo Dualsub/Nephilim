@@ -30,6 +30,8 @@ namespace Nephilim.Sandbox
             var game = new Game2D("DefaultScene", LoadLoadingScreen());
             game.AddSystems += Game_AddSystems;
             PushLayer(game);
+            //var renderingTest = new RenderingTest();
+            //PushLayer(renderingTest);
         }
 
         private Bitmap LoadLoadingScreen()
@@ -49,7 +51,9 @@ namespace Nephilim.Sandbox
 
         private void Game_AddSystems(Registry registry)
         {
-            registry.AddSystem<PlayerControlSystem>(UpdateFlags.Update);
+            registry.AddSystem<PlayerControlSystem>(UpdateFlags.Update | UpdateFlags.FixedUpdate);
+            registry.AddSystem<ProjectileSystem>(UpdateFlags.FixedUpdate);
+            registry.AddSystem<CursorSystem>(UpdateFlags.Update);
         }
     }
 }

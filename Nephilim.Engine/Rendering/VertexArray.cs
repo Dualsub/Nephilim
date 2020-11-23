@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-using OpenTK.Graphics.OpenGL4;
+﻿using OpenTK.Graphics.OpenGL4;
 
 namespace Nephilim.Engine.Rendering
 {
     public class VertexArray : IBindable
     {
-
+		private int vertexBufferIndex = 0;
 		private int _id = 0;
         private IndexBuffer _indexBuffer;
 
@@ -25,8 +21,24 @@ namespace Nephilim.Engine.Rendering
 
 		internal void AddVetexBuffer(VertexBuffer vertexBuffer)
         {
-			this.Bind();
+			Bind();
 			vertexBuffer.Bind();
+			vertexBufferIndex = 0;
+			int stride = VertexBuffer.CalculateStride(vertexBuffer.Layout);
+			int offset = 0;
+            foreach (var element in vertexBuffer.Layout)
+            {
+				GL.EnableVertexArrayAttrib(_id, vertexBufferIndex);
+				GL.VertexAttribPointer(vertexBufferIndex,
+					element.Value,
+					VertexAttribPointerType.Float,
+					false,
+					stride,
+					offset * sizeof(float)
+					);
+				offset += element.Value;
+				vertexBufferIndex++;
+			}
 		}
 
 		public void Bind() => GL.BindVertexArray(_id);
@@ -40,107 +52,4 @@ namespace Nephilim.Engine.Rendering
 			_indexBuffer = indexBuffer;
 		}
     }
-
-	/*
-
-	OpenGLVertexArray::OpenGLVertexArray()
-		{
-			HZ_PROFILE_FUNCTION();
-
-			glCreateVertexArrays(1, &m_RendererID);
-		}
-
-		OpenGLVertexArray::~OpenGLVertexArray()
-		{
-			HZ_PROFILE_FUNCTION();
-
-			glDeleteVertexArrays(1, &m_RendererID);
-		}
-
-		void OpenGLVertexArray::Bind() const
-		{
-			HZ_PROFILE_FUNCTION();
-
-			glBindVertexArray(m_RendererID);
-		}
-
-		void OpenGLVertexArray::Unbind() const
-		{
-			HZ_PROFILE_FUNCTION();
-
-			glBindVertexArray(0);
-		}
-
-		void OpenGLVertexArray::AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer)
-		{
-			HZ_PROFILE_FUNCTION();
-
-			HZ_CORE_ASSERT(vertexBuffer->GetLayout().GetElements().size(), "Vertex Buffer has no layout!");
-
-			glBindVertexArray(m_RendererID);
-			vertexBuffer->Bind();
-
-			const auto& layout = vertexBuffer->GetLayout();
-			for (const auto& element : layout)
-			{
-				switch (element.Type)
-				{
-					case ShaderDataType::Float:
-					case ShaderDataType::Float2:
-					case ShaderDataType::Float3:
-					case ShaderDataType::Float4:
-					case ShaderDataType::Int:
-					case ShaderDataType::Int2:
-					case ShaderDataType::Int3:
-					case ShaderDataType::Int4:
-					case ShaderDataType::Bool:
-					{
-						glEnableVertexAttribArray(m_VertexBufferIndex);
-						glVertexAttribPointer(m_VertexBufferIndex,
-							element.GetComponentCount(),
-							ShaderDataTypeToOpenGLBaseType(element.Type),
-							element.Normalized ? GL_TRUE : GL_FALSE,
-							layout.GetStride(),
-							(const void*)element.Offset);
-						m_VertexBufferIndex++;
-						break;
-					}
-					case ShaderDataType::Mat3:
-					case ShaderDataType::Mat4:
-					{
-						uint8_t count = element.GetComponentCount();
-						for (uint8_t i = 0; i < count; i++)
-						{
-							glEnableVertexAttribArray(m_VertexBufferIndex);
-							glVertexAttribPointer(m_VertexBufferIndex,
-								count,
-								ShaderDataTypeToOpenGLBaseType(element.Type),
-								element.Normalized ? GL_TRUE : GL_FALSE,
-								layout.GetStride(),
-								(const void*)(element.Offset + sizeof(float) * count * i));
-							glVertexAttribDivisor(m_VertexBufferIndex, 1);
-							m_VertexBufferIndex++;
-						}
-						break;
-					}
-					default:
-						HZ_CORE_ASSERT(false, "Unknown ShaderDataType!");
-				}
-			}
-
-			m_VertexBuffers.push_back(vertexBuffer);
-		}
-
-		void OpenGLVertexArray::SetIndexBuffer(const Ref<IndexBuffer>& indexBuffer)
-		{
-			HZ_PROFILE_FUNCTION();
-
-			glBindVertexArray(m_RendererID);
-			indexBuffer->Bind();
-
-			m_IndexBuffer = indexBuffer;
-		}
-
-
-	*/
 }

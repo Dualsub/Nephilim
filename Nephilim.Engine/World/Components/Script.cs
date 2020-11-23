@@ -8,8 +8,10 @@ namespace Nephilim.Engine.World.Components
     public abstract class Script : IComponent
     {
 
-        Registry _registry;
-        EntityID _owningEntity;
+        private Registry _registry;
+        private EntityID _owningEntity;
+
+        public Registry Registry { get => _registry; }
 
         public void Init(Registry registry, EntityID entityID)
         {

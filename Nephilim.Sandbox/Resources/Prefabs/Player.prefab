@@ -13,15 +13,19 @@
     },
 
     "scale": {
-      "x": 0.64,
-      "y": 0.64,
+      "x": 0.5,
+      "y": 0.5,
       "z": 1.0
     }
   },
   "TagComponent": {
     "Tag": "Player"
   },
+  "ChildComponent": {
+    "PrefabFile": "Weapon"
+  },
   "CameraFollowComponent": {
+    "LagAmount": 0.5
   },
   "ShakePlayer": {
     "ShakeRadius": 1.5,
@@ -36,11 +40,11 @@
   "MovementComponent": {
     "Acceleration": 2000.0,
     "MaxSpeed": 4.0,
-    "JumpAcceleration": 800.0
+    "JumpAcceleration": 8000.0
   },
   "BoxCollider": {
-    "Width": 20.0,
-    "Height": 56.0
+    "Width": 40.0,
+    "Height": 108.0
   },
   "RigidBody2D": {
     "Density": 2.0,
@@ -48,6 +52,7 @@
     "AngularDamping": 2.0,
     "Friction": 2.0,
     "Restitution": 0.0,
-    "FixedRotation": true
+    "FixedRotation": true,
+    "RegisterContacts": true
   }
 }

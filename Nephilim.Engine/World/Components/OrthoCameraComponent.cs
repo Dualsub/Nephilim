@@ -6,13 +6,14 @@ using Nephilim.Engine.Rendering;
 
 namespace Nephilim.Engine.World.Components
 {
-    class OrthoCameraComponent : ICamera, ISingletonComponent
+    public class OrthoCameraComponent : ICamera, ISingletonComponent
     {
         private Matrix4 _transform;
         private Matrix4 _projectionMatrix;
         private Vector2 _offset = new Vector2(0);
         private bool _isProjectionDirty = false;
         private float _zoom = 1.0f;
+
         public float Speed { get; set; } = 100;
         public float Zoom
         {
@@ -27,9 +28,8 @@ namespace Nephilim.Engine.World.Components
 
         public Vector2 Offset { get => _offset; }
 
+        public Vector3 Position { get => _transform.ExtractTranslation(); }
 
-
-        public Vector3 Position { get => _transform.ExtractTranslation(); }// + new Vector3(_offset); }
         public OrthoCameraComponent(Matrix4 transform)
         {
             _transform = transform;

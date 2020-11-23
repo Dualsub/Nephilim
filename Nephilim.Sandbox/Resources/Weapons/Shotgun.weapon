@@ -1,0 +1,11 @@
+﻿{
+	"Name": "Shotgun",
+	"DefaultMagSize": 10,
+	"BaseDamage": 30.0,
+	"FireRate": 100.0,
+	"Spread": 5.0,
+	"ShakeAmount": 10.0,
+	"SpriteSheetName": "SG",
+	"BulletsPerFire": 5,
+	"GunSoundName": "ShotgunSound"
+}

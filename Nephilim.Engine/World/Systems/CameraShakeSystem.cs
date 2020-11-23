@@ -26,11 +26,10 @@ namespace Nephilim.Engine.World.Systems
                 {
                     shakeComponent.Timer = 0;
                     offset += new Vector2((float)(Math.Sin(shakeComponent.StartAngle) * shakeComponent.CurrentRadius), (float)(Math.Cos(shakeComponent.StartAngle) * shakeComponent.CurrentRadius));
-                    shakeComponent.CurrentRadius -= shakeComponent.FallOff * ts;
+                    shakeComponent.CurrentRadius -= (shakeComponent.FallOff * ts.DeltaTime);
                     shakeComponent.StartAngle += (150 + new Random().Next(60));
 
-                    Log.Print(shakeComponent.CurrentRadius);
-
+                    Log.Print("Shake: "+shakeComponent.CurrentRadius.ToString());
 
                     if (registry.TryGetSingletonComponent(out OrthoCameraComponent cameraComponent))
                     {

@@ -1,0 +1,31 @@
+{
+	"SpriteSheet": "WeaponsSheet",
+	"CellWidth": 320,
+	"CellHeight": 64,
+	"Animations": {
+		"ARFire": {
+			"Begin": 0,
+			"End": 2
+		},
+		"ARIdle": {
+			"Begin": 3,
+			"End": 12
+		},
+		"SGFire": {
+			"Begin": 13,
+			"End": 19
+		},
+		"SGIdle": {
+			"Begin": 20,
+			"End": 29
+		},
+		"SMGFire": {
+			"Begin": 30,
+			"End": 32
+		},
+		"SMGIdle": {
+			"Begin": 33,
+			"End": 42
+		}
+	}
+}

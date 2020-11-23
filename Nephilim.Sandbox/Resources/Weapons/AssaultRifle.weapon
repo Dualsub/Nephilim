@@ -1,0 +1,10 @@
+﻿{
+	"Name": "AssaultRifle",
+	"DefaultMagSize": 30,
+	"BaseDamage": 20.0,
+	"FireRate": 350.0,
+	"Spread": 5.0,
+	"ShakeAmount": 1.0,
+	"SpriteSheetName": "AR",
+	"GunSoundName": "WeaponFire01"
+}

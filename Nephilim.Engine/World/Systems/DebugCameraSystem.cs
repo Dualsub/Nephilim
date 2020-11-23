@@ -34,6 +34,15 @@ namespace Nephilim.Engine.World.Systems
                     else
                         Renderer2D.DebugFlags |= DebugRenderingFlags.DebugRenderers;
                 }
+
+                if (e.Key == OpenTK.Windowing.GraphicsLibraryFramework.Keys.F5)
+                {
+                    if (Application.TimeDilation < 1f)
+                        Application.TimeDilation = 1f;
+                    else
+                        Application.TimeDilation = .3f;
+                        
+                }
             };
         }
 

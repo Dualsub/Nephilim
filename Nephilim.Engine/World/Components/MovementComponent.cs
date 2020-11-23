@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,8 @@ namespace Nephilim.Engine.World.Components
         public float MaxSpeed { get; set; } = 0;
         public float Acceleration { get; set; } = 0;
         public float JumpAcceleration { get; set; } = 0;
+        [JsonIgnore]
+        public bool Grounded { get; set; } = false;
 
         public MovementComponent(float acceleration, float maxSpeed, float jumpAcceleration)
         {

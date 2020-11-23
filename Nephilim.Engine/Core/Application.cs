@@ -1,5 +1,6 @@
 ﻿
 using Nephilim.Engine.Assets;
+using Nephilim.Engine.Audio;
 using Nephilim.Engine.Util;
 using Nephilim.Engine.World;
 using Nephilim.Engine.World.Components;
@@ -42,6 +43,8 @@ namespace Nephilim.Engine.Core
             _appContext.Update += WindowDriver_Update;
             _appContext.Render += WindowDriver_Render;
             _appContext.Resize += WindowDriver_Resize;
+
+            Audio.AudioManager.Init();
 
             ResourceManager = new ResourceManager();
             ResourceManager.StartLoading();
@@ -139,7 +142,7 @@ namespace Nephilim.Engine.Core
 
         public void Dispose()
         {
-            
+            AudioManager.Dispose();
         }
     }
 }

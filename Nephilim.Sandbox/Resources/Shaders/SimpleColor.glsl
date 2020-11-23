@@ -37,7 +37,7 @@ void main(void){
 
 	vec4 color = useColorOnly < 0.5 ? texture(modelTexture, pass_textureCoordinates) : color;
 
-	if(color.a < 0.5) 
+	if(color.a < 0.5 && useColorOnly < 0.5) 
 		discard;
 
 	out_Color = color;

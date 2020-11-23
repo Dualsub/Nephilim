@@ -7,7 +7,7 @@ namespace Nephilim.Engine.Util
     public static class Log
     {
         private static Action<string> _loggningAction = Console.WriteLine;
-        
+
         public static void SetLoggningMethod(Action<string> loggningAction)
         {
             _loggningAction = loggningAction;

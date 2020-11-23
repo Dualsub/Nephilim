@@ -10,7 +10,7 @@ namespace Nephilim.Engine.World.Systems
 {
     class PlayerControlSystem : System
     {
-
+        
         protected override void OnUpdate(Registry registry, TimeStep ts)
         {
             var entities = registry.GetEntitiesWithComponent<MovementComponent>();

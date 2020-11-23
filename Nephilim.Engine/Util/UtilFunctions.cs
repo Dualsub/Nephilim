@@ -7,7 +7,7 @@ using System.Runtime.Serialization;
 
 namespace Nephilim.Engine.Util
 {
-    static class UtilFunctions
+    public static class UtilFunctions
     {
 
         public static Matrix4 CreateTransformation(Vector3 position, float angle, Vector3 scale)

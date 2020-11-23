@@ -78,7 +78,7 @@ namespace Nephilim.Engine.World
 
         public override string ToString()
         {
-            return "EntityID: " + _id + " SerialNumber:" + _serialNumber;
+            return "EntityID: " + _id;
         }
 
         public override int GetHashCode()

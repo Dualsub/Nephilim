@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System;
 using Box2DX.Common;
 using OpenTK.Graphics.ES11;
+using Nephilim.Engine.Util;
+using Nephilim.Engine.Physics;
 
 namespace Nephilim.Engine.World.Components
 {
@@ -20,37 +22,36 @@ namespace Nephilim.Engine.World.Components
 
         private ContactListner _contactListner;
 
-        public HashSet<BulletHitResult> BulletBuffer { get => _contactListner is null ? new HashSet<BulletHitResult>() : _contactListner._collisionBuffer; }
-
-
         public void SetBulletListner()
         {
             _contactListner = new ContactListner();
             _world.SetContactListener(_contactListner);
         }
 
-        public void ClearBulletBuffer()
+        public void ClearContactBuffers()
         {
             if (_contactListner is null)
                 return;
-            _contactListner._collisionBuffer.Clear();
-            _contactListner._pairBuffer.Clear();
+            _contactListner._contactBuffer.Clear();
         }
 
         private class ContactListner : ContactListener
         {
-            public HashSet<BulletHitResult> _collisionBuffer = new HashSet<BulletHitResult>();
-            public HashSet<Tuple<EntityID, EntityID>> _pairBuffer = new HashSet<Tuple<EntityID, EntityID>>();
+            public Dictionary<ContactPair, Contact> _contactBuffer = new Dictionary<ContactPair, Contact>();
 
             public void BeginContact(Contact contact)
             {
-                if (contact.FixtureA.Body.IsBullet() || contact.FixtureB.Body.IsBullet())
-                    if (ToHitResult(contact, out var result))
-                        _collisionBuffer.Add(result);
+                var e1 = (EntityID)contact.FixtureA.Body.GetUserData();
+                var e2 = (EntityID)contact.FixtureB.Body.GetUserData();
+                if(!(contact.FixtureA.Body.IsBullet() && contact.FixtureB.Body.IsBullet()))
+                    _contactBuffer.TryAdd(new ContactPair(e1, e2), contact);
             }
 
             public void EndContact(Contact contact)
             {
+                var e1 = (EntityID)contact.FixtureA.Body.GetUserData();
+                var e2 = (EntityID)contact.FixtureB.Body.GetUserData();
+                _contactBuffer.Remove(new ContactPair(e1, e2));
             }
 
             public void PostSolve(Contact contact, ContactImpulse impulse)
@@ -61,59 +62,31 @@ namespace Nephilim.Engine.World.Components
             {
                 
             }
-
-            private bool ToHitResult(Contact contact, out BulletHitResult bulletHitResult)
-            {
-                if ((contact.FixtureA is null) || (contact.FixtureA.Body.GetUserData() is null) || (contact.FixtureB is null) || (contact.FixtureB.Body.GetUserData() is null))
-                {
-                    bulletHitResult = default;
-                    return false;
-                }
-
-                EntityID e1 = (EntityID)contact.FixtureA.Body.GetUserData();
-                EntityID e2 = (EntityID)contact.FixtureB.Body.GetUserData();
-                if (_pairBuffer.Contains(new Tuple<EntityID, EntityID>(e1, e2)))
-                {
-                    bulletHitResult = default;
-                    return false;
-                }
-
-                _pairBuffer.Add(new Tuple<EntityID, EntityID>(e1, e2));
-                _pairBuffer.Add(new Tuple<EntityID, EntityID>(e2, e1));
-                contact.GetWorldManifold(out var wm);
-                bulletHitResult = new BulletHitResult(
-                    e1, 
-                    e2, 
-                    Util.UtilFunctions.FromVec2(wm.Points[0]), 
-                    Util.UtilFunctions.FromVec2(wm.Normal)
-                    );
-                return true;
-
-            }
         }
 
-        public struct BulletHitResult
+        internal void QueryContacts(Registry registry)
         {
-            public readonly EntityID entity1;
-            public readonly EntityID entity2;
-            public readonly Vector2 location;
-            public readonly Vector2 normal;
-
-            public BulletHitResult(EntityID entity1, EntityID entity2, Vector2 location, Vector2 normal)
+            foreach (var entity in registry.GetEntitiesWithComponent<RigidBody2D>())
             {
-                this.entity1 = entity1;
-                this.entity2 = entity2;
-                this.location = location;
-                this.normal = normal;
+                RigidBody2D rb2dA = registry.GetComponent<RigidBody2D>(entity);
+                if (rb2dA.RegisterContacts)
+                    rb2dA.Contacts.Clear();
             }
-        }
+            
+            foreach (var contact in _contactListner._contactBuffer)
+            {
+                if(registry.TryGetComponent(contact.Key.entityA, out RigidBody2D rb2dA))
+                {
+                    if(rb2dA.RegisterContacts)
+                        rb2dA.Contacts.Add(new EntityContact(contact.Key.entityB, contact.Value));
+                }
 
-        public struct HitResult
-        {
-            public readonly EntityID entity1;
-            public readonly EntityID entity2;
-            public readonly Vector2 location;
-            public readonly Vector2 normal;
+                if (registry.TryGetComponent(contact.Key.entityB, out RigidBody2D rb2dB))
+                {
+                    if (rb2dB.RegisterContacts)
+                        rb2dB.Contacts.Add(new EntityContact(contact.Key.entityA, contact.Value));
+                }
+            }
         }
     }
 }

@@ -18,28 +18,23 @@ namespace Nephilim.Engine.World.Components
         private Vector3 _rotation;
         private Vector3 _scale;
 
-        private Matrix4 _defaultTransform;
+        private Vector3 _localPosition;
+        private Vector3 _localRotation;
+        private Vector3 _localScale;
+
         private string _parentTag = string.Empty;
         private List<EntityID> _children = new List<EntityID>();
 
         public string ParentTag { get => _parentTag; set => _parentTag = value; }
         public IEnumerable<EntityID> Children { get => _children; }
-        
-        public Matrix4 DefaultTransform { get => _defaultTransform; set => _defaultTransform = value; }
-        public Vector3 Position
-        {
-            get => _position; set => _position = value;
-        }
 
-        public Vector3 Scale
-        {
-            get => _scale; set => _scale = value;
-        }
+        public Vector3 Position { get => _position; set => _position = value; }
+        public Vector3 Scale { get => _scale; set => _scale = value; }
+        public Vector3 Rotation { get => _rotation; set => _rotation = value; }
 
-        public Vector3 Rotation 
-        {
-            get => _rotation; set => _rotation = value;
-        }
+        public Vector3 LocalPosition { get => _localPosition; set => _localPosition = value; }
+        public Vector3 LocalRotation { get => _localRotation; set => _localRotation = value; }
+        public Vector3 LocalScale { get => _localScale; set => _localScale = value; }
 
         public TransformComponent(Vector3 position, Quaternion rotation, Vector3 scale)
         {
@@ -57,15 +52,15 @@ namespace Nephilim.Engine.World.Components
 
         public void SetTransform(Matrix4 transform) 
         {
-            
+            _scale = transform.ExtractScale();
+            _rotation = transform.ExtractRotation().ToEulerAngles();
+            _position = transform.ExtractTranslation();
         }
 
         public Matrix4 GetTransform()
         {
             var transform = Matrix4.Identity;
-            transform *= Matrix4.CreateScale(_scale);
-            transform *= Matrix4.CreateFromQuaternion(Quaternion.FromEulerAngles(_rotation));
-            transform *= Matrix4.CreateTranslation(_position);
+            transform = Matrix4.CreateScale(_scale) * Matrix4.CreateFromQuaternion(Quaternion.FromEulerAngles(_rotation)) * Matrix4.CreateTranslation(_position);
             return transform;
         }
 
@@ -80,10 +75,25 @@ namespace Nephilim.Engine.World.Components
             _rotation.Z = angle;
         }
 
+        public void SetLocalTransform(Matrix4 transform)
+        {
+            _localScale = transform.ExtractScale();
+            _localRotation = transform.ExtractRotation().ToEulerAngles();
+            _localPosition = transform.ExtractTranslation();
+        }
+
+        public Matrix4 GetLocalTransform()
+        {
+            var transform = Matrix4.Identity;
+            transform = Matrix4.CreateScale(_localScale) * Matrix4.CreateFromQuaternion(Quaternion.FromEulerAngles(_localRotation)) * Matrix4.CreateTranslation(_localPosition);
+            return transform;
+        }
+
         public void AddChild(EntityID childEntity)
         {
             _children.Add(childEntity);
         }
+
         public TransformComponent(SerializationInfo info, StreamingContext context)
         {
             float x = 1, y = 1, z = 1;
@@ -132,7 +142,7 @@ namespace Nephilim.Engine.World.Components
 
             _position = new Vector3(x,y,z);
 
-            _defaultTransform = GetTransform();
+            SetLocalTransform(GetTransform());
 
             try
             {

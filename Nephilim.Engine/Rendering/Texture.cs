@@ -23,6 +23,7 @@ namespace Nephilim.Engine.Rendering
         int _textureSlot = 0;
         int _width = 0, _height = 0;
 
+        public int ID { get => _textureID; }
         public int Width { get => _width; }
         public int Height { get => _height; }
         public string Path { get; set; }

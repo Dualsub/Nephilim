@@ -10,6 +10,7 @@ namespace Nephilim.Engine.World.Components
     [Serializable]
     public class SpriteAnimator : IComponent, ISerializable
     {
+        private string _originalAnimation = string.Empty;
         private SpriteSheet _sheet = null;
         private int _beginIndex = 0, _endIndex = 0;
         private int _currentFrame = 0;
@@ -29,9 +30,15 @@ namespace Nephilim.Engine.World.Components
         public void AddToCurrentFrame(int numFrames)
         {
             var value = _currentFrame + numFrames;
-            if (value > _endIndex && _loop)
+            if (value > _endIndex)
             {
-                _currentFrame = _beginIndex;
+                if(_loop)
+                    _currentFrame = _beginIndex;
+                else if (!string.IsNullOrEmpty(_originalAnimation))
+                {
+                    SetAnimation(_originalAnimation);
+                    _originalAnimation = string.Empty;
+                }
             }
             else if (value <= _endIndex)
             {
@@ -58,6 +65,14 @@ namespace Nephilim.Engine.World.Components
             {
                 return _sheet.Texture;
             } 
+        }
+
+        public void PlayOverlayAnimation(string name)
+        {
+            if (_originalAnimation == name || CurrentAnimation == name)
+                return;
+            _originalAnimation = CurrentAnimation;
+            SetAnimation(name, false);
         }
 
         public void SetAnimation(string name, bool loop = true)

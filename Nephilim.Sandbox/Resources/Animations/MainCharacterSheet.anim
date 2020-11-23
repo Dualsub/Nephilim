@@ -1,0 +1,31 @@
+{
+	"SpriteSheet": "MainCharacterSheet",
+	"CellWidth": 256,
+	"CellHeight": 256,
+	"Animations": {
+		"Fall": {
+			"Begin": 0,
+			"End": 4
+		},
+		"Run": {
+			"Begin": 5,
+			"End": 10
+		},
+		"Idle": {
+			"Begin": 11,
+			"End": 18
+		},
+		"Jump": {
+			"Begin": 19,
+			"End": 23
+		},
+		"RunBackwards": {
+			"Begin": 24,
+			"End": 32
+		},
+		"RunStart": {
+			"Begin": 33,
+			"End": 35
+		}
+	}
+}

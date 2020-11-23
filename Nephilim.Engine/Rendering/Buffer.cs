@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
+using static Nephilim.Engine.Rendering.SpriteBatchRenderer;
 
 namespace Nephilim.Engine.Rendering
 {
@@ -13,10 +14,10 @@ namespace Nephilim.Engine.Rendering
         public void Unbind();
     }
 
-
     public class VertexBuffer : IBindable
     {
         private int _vboID = 0;
+        public Dictionary<string, int> Layout { get; private set; }
 
         private VertexBuffer(int vboID)
         {
@@ -31,6 +32,35 @@ namespace Nephilim.Engine.Rendering
             return new VertexBuffer(vboID);
         }
 
+        public void SetLayout(Dictionary<string, int> layout)
+        {
+            if (layout is null)
+                throw new ArgumentNullException(nameof(layout));
+
+            Layout = layout;
+        }
+
+        public static int CalculateStride(Dictionary<string, int> layout)
+        {
+            if (layout is null)
+                throw new NullReferenceException(nameof(Layout));
+
+            int stride = 0;
+            foreach (var element in layout)
+                stride += element.Value;
+
+            return stride;
+        }
+
+        public void SetData(Vertex[] data, int size)
+        {
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _vboID);
+            var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+            var dataPtr = dataHandle.AddrOfPinnedObject();
+            GL.BufferSubData(BufferTarget.ArrayBuffer, IntPtr.Zero, (IntPtr)size, dataPtr);
+            dataHandle.Free();
+        }
+
         public void SetData(float[] data, int size)
 	    {
 		    GL.BindBuffer(BufferTarget.ArrayBuffer, _vboID);
@@ -43,7 +73,7 @@ namespace Nephilim.Engine.Rendering
             GL.BufferSubData(BufferTarget.ArrayBuffer, IntPtr.Zero, size, data);
         }
 
-    public void Bind() => GL.BindBuffer(BufferTarget.ArrayBuffer, _vboID);
+        public void Bind() => GL.BindBuffer(BufferTarget.ArrayBuffer, _vboID);
         public void Unbind() => GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
     }
 
@@ -56,14 +86,14 @@ namespace Nephilim.Engine.Rendering
             _vboID = vboID;
         }
 
-        public static IndexBuffer Create(int[] indicies, int count)
+        public static IndexBuffer Create(uint[] indicies, int count)
         {
             int vboID = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ArrayBuffer, vboID);
-            GL.BufferData(BufferTarget.ArrayBuffer, count * sizeof(int), indicies, BufferUsageHint.StaticDraw);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, vboID);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, count * sizeof(uint), indicies, BufferUsageHint.StaticDraw);
             return new IndexBuffer(vboID);
         }
-        public void Bind() => GL.BindBuffer(BufferTarget.ElementArrayBuffer, _vboID);
-        public void Unbind() => GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
+        public void Bind() => GL.BindBuffer(BufferTarget.ArrayBuffer, _vboID);
+        public void Unbind() => GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
     }
 }

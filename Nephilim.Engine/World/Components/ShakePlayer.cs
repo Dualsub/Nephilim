@@ -13,7 +13,7 @@ namespace Nephilim.Engine.World.Components
         [JsonIgnore]
         public float StartAngle { get; internal set; }
         public float CurrentRadius { get => _currentRadius; 
-            internal set 
+            set 
             {
                 if (value < 0)
                 {

@@ -8,6 +8,11 @@ using System.Text;
 
 namespace Nephilim.BuildTool.Builders
 {
+    /// <summary>
+    /// This builder generates a spritesheet from a set of .png images and
+    /// can optionally create an .anim-file based on the name of the images.
+    /// </summary>
+
     class SpriteSheetBuilder : IBuilder
     {
 
@@ -117,11 +122,16 @@ namespace Nephilim.BuildTool.Builders
                 {
                     var animName = fileName[1];
                     var begin = i;
-                    while(i < files.Length-1 && fileName[1] == animName)
+                    while(i < files.Length-1)
                     {
                         i++;
                         fileName = Path.GetFileNameWithoutExtension(files[i]).Split("_");
                         Console.WriteLine(animName);
+                        if (fileName[1] != animName)
+                        {
+                            i--;
+                            break;
+                        }
                     }
                     var end = i;
 
@@ -135,7 +145,7 @@ namespace Nephilim.BuildTool.Builders
             fileText += "\t}\n";
             fileText += "}";
 
-            File.WriteAllText(outputPath.Replace(".png", ".anim"), fileText);
+            File.WriteAllText(outputPath.Replace(".png", "")+".anim", fileText);
         }
     }
 }

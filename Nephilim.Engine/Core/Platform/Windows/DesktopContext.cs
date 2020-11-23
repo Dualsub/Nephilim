@@ -119,6 +119,9 @@ namespace Nephilim.Engine.Core
                     (int)gameConfig.WindowConfig.Height
                     );
 
+            CursorGrabbed = true;
+            CursorVisible = false;
+
             LoadInputEvents();
         }
 
@@ -164,10 +167,9 @@ namespace Nephilim.Engine.Core
             _sw.Start();
             LoadIcon();
 #if DEBUG
-            Log.Print(GL.GetString(StringName.Vendor));
-            Log.Print(GL.GetString(StringName.Renderer));
-            Log.Print(GL.GetString(StringName.ShadingLanguageVersion));
-            Log.Print(GL.GetString(StringName.Version));
+            Log.Print("\t" + GL.GetString(StringName.Vendor));
+            Log.Print("\t" + GL.GetString(StringName.Renderer));
+            Log.Print("\t" + GL.GetString(StringName.Version));
 #endif
 
         }

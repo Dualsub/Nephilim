@@ -83,11 +83,23 @@ namespace Nephilim.Engine.Rendering
             GL.DrawElements(PrimitiveType.Triangles, Quad.Count, DrawElementsType.UnsignedInt, 0);
         }
 
+        public static void DrawQuad(Color4 color, Matrix4 transform)
+        {
+            if (!HasCamera)
+                return;
+            _shader.SetUniform("transformationMatrix", transform);
+            _shader.SetUniform("useTextureOffset", false);
+            _shader.SetUniform("useColorOnly", true);
+            _shader.SetUniform("color", color);
+            GL.DrawElements(PrimitiveType.Triangles, Quad.Count, DrawElementsType.UnsignedInt, 0);
+        }
+
 
         public static void DrawQuad(Texture texture, Matrix4 transform)
         {
             if (!HasCamera)
                 return;
+            transform = Matrix4.CreateScale(new Vector3(texture.Height / Quad.DefaultSize, texture.Height / Quad.DefaultSize, 1) * transform.ExtractScale()) * transform.ClearScale();
             _shader.SetUniform("transformationMatrix", transform);
             _shader.SetUniform("useTextureOffset", false);
             _shader.SetUniform("useColorOnly", false);
@@ -100,6 +112,7 @@ namespace Nephilim.Engine.Rendering
         {
             if (!HasCamera)
                 return;
+            transform = Matrix4.CreateScale(textureOffset.Z * texture.Width / Quad.DefaultSize, textureOffset.W * texture.Height / Quad.DefaultSize, 1) * transform;
             _shader.SetUniform("transformationMatrix", transform);
             _shader.SetUniform("useTextureOffset", true);
             _shader.SetUniform("textureOffset", textureOffset);

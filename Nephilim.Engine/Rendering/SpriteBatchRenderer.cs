@@ -4,25 +4,15 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Runtime.InteropServices;
+using Nephilim.Engine.Input;
 
 namespace Nephilim.Engine.Rendering
 {
     public static class SpriteBatchRenderer
     {
-        private struct Vertex
-        {
-            Vector3 position;
-            Vector2 textureCoords;
-            Color4 color;
-            float texture_id;
-
-            // Manually enterd the number of floats.
-            public static int Size { get => (3 + 2 + 4 + 1) * sizeof(float); }
-        }
-
         private class BatchData
         {
-            public const int MaxBatchSize = 10000;
+            public const int MaxBatchSize = 256;
             public const int MaxNumVerticies = MaxBatchSize * 4;
             public const int MaxNumIndices = MaxBatchSize * 6;
             public const int MaxNumTextures = 32;
@@ -30,16 +20,19 @@ namespace Nephilim.Engine.Rendering
             public VertexArray QuadVertexArray;
             public VertexBuffer QuadVertexBuffer;
             public Vertex[] QuadVertcies = new Vertex[MaxNumVerticies];
+            //public GCHandle QuadVertcies;
+            public int QuadVertexCount = 0;
             public Shader Shader;
             public Texture[] TextureSlots = new Texture[MaxNumTextures];
             public int TextureSlotIndex = (int)TextureUnit.Texture0;
             public Vector4[] QuadVertexPositions = new Vector4[4];
             public int QuadIndexCount = 0;
-
-
         }
 
-        private static BatchData _data;
+        private static DebugProc _debugProcCallback = DebugCallback;
+        private static GCHandle _debugProcCallbackHandle;
+
+        private static BatchData _data = new BatchData();
 
         private static Color4 _defaultClearColor = new Color4(0.1f, 0.1f, 0.1f, 1.0f);
         private static ICamera _camera;
@@ -49,6 +42,12 @@ namespace Nephilim.Engine.Rendering
 
         public static void Init(ICamera camera, Color4 color)
         {
+            _debugProcCallbackHandle = GCHandle.Alloc(_debugProcCallback);
+
+            GL.DebugMessageCallback(_debugProcCallback, IntPtr.Zero);
+            GL.Enable(EnableCap.DebugOutput);
+            GL.Enable(EnableCap.DebugOutputSynchronous);
+
             _camera = camera;
             if (!HasCamera)
                 return;
@@ -62,12 +61,18 @@ namespace Nephilim.Engine.Rendering
             _data.QuadVertexArray = VertexArray.Create();
 
             _data.QuadVertexBuffer = VertexBuffer.Create(BatchData.MaxNumVerticies * Vertex.Size);
+            _data.QuadVertexBuffer.SetLayout(new Dictionary<string, int>{
+                { "position" ,      3 },
+                { "textureCoords" , 2 },
+                { "color" ,         4 },
+                { "texture_id" ,    1 }
+            });
 
             _data.QuadVertexArray.AddVetexBuffer(_data.QuadVertexBuffer);
 
-            int[] quadIndices = new int[BatchData.MaxNumIndices];
+            uint[] quadIndices = new uint[BatchData.MaxNumIndices];
 
-            int offset = 0;
+            uint offset = 0;
             for (int i = 0; i < BatchData.MaxNumIndices; i += 6)
             {
                 quadIndices[i + 0] = offset + 0;
@@ -85,7 +90,7 @@ namespace Nephilim.Engine.Rendering
 
             _data.QuadVertexArray.SetIndexBuffer(indexBuffer);
             
-            _data.Shader = Shader.LoadShader("TextureShader");
+            _data.Shader = Shader.LoadShader(@"C:\dev\csharp\nephilim\Nephilim.Sandbox\Resources\Shaders\Texture.glsl", true);
 
             var textureSampler = new int[BatchData.MaxNumTextures];
 
@@ -93,9 +98,8 @@ namespace Nephilim.Engine.Rendering
             {
                 textureSampler[i] = (int)TextureUnit.Texture0 + i;
             }
-
-            _data.Shader.SetUniform("u_Textures", textureSampler);
-
+            _data.Shader.Bind();
+            _data.Shader.SetUniform("textures", textureSampler);
             _data.QuadVertexPositions[0] = new Vector4(-0.5f,  -0.5f,   0.0f,  1.0f);
             _data.QuadVertexPositions[1] = new Vector4( 0.5f,  -0.5f,   0.0f,  1.0f);
             _data.QuadVertexPositions[2] = new Vector4( 0.5f,   0.5f,   0.0f,  1.0f);
@@ -121,36 +125,30 @@ namespace Nephilim.Engine.Rendering
             _data.Shader.SetUniform("projectionMatrix", _projectionMatrix);
             _data.Shader.SetUniform("viewMatrix", _camera.GetViewMatrix());
 
+            _data.TextureSlotIndex = 0;
             _data.QuadIndexCount = 0;
-            //_data.QuadVertexBufferPtr = _data.QuadVertexBufferBase;
-
-            _data.TextureSlotIndex = (int)TextureUnit.Texture0;
-            _data.QuadIndexCount = 0;
-
         }
 
-        private unsafe static void FlushBatch()
+        private static void FlushBatch()
         {
             if (_data.QuadIndexCount == 0)
                 return; // Nothing to draw
 
-            fixed (Vertex* vertexArrayFixedPtr = _data.QuadVertcies)
-            {
-                var vertexArrayPtr = vertexArrayFixedPtr;
-                //    *(vertexArrayPtr + 0) = item.vertexTL;
-                //    *(vertexArrayPtr + 1) = item.vertexTR;
-                //    *(vertexArrayPtr + 2) = item.vertexBL;
-                //    *(vertexArrayPtr + 3) = item.vertexBR;
-            }
-
-            int dataSize = Vertex.Size * _data.QuadVertcies.Length;
-            _data.QuadVertexBuffer.SetData(IntPtr.Zero, dataSize);
+            int dataSize = Vertex.Size * _data.QuadVertexCount;
+            _data.QuadVertexBuffer.SetData(_data.QuadVertcies, dataSize);
 
             // Bind textures
             for (int i = 0; i < _data.TextureSlotIndex; i++)
                 _data.TextureSlots[i].Bind(i);
-
             GL.DrawElements(BeginMode.Triangles, _data.QuadIndexCount, DrawElementsType.UnsignedInt, 0);
+            
+            GL.BindTexture(TextureTarget.Texture2D, 0);
+            _data.QuadVertexCount = 0;
+
+
+            if (InputManager.IsKeyDown(OpenTK.Windowing.GraphicsLibraryFramework.Keys.K)) 
+            {
+            }
         }
 
         public static void DrawQuad(Vector4 color, Matrix4 transform)
@@ -165,13 +163,11 @@ namespace Nephilim.Engine.Rendering
                 return;
         }
 
-        public static void DrawQuad(Texture texture, Vector4 textureOffset, Matrix4 transform)
+        public static unsafe void DrawQuad(Texture texture, Color4 color, Vector4 textureOffset, Matrix4 transform)
         {
             if (!HasCamera)
                 return;
 
-
-            int quadVertexCount = 4;
             Vector2[] textureCoords = { 
                 new Vector2 { X = 0.0f, Y = 0.0f },
                 new Vector2 { X = 1.0f, Y = 0.0f }, 
@@ -185,7 +181,7 @@ namespace Nephilim.Engine.Rendering
 
             float textureIndex = 0.0f;
 
-            for (int i = 1; i < _data.TextureSlotIndex; i++)
+            for (int i = 0; i < _data.TextureSlotIndex; i++)
             {
                 if (_data.TextureSlots[i] == texture)
                 {
@@ -199,33 +195,33 @@ namespace Nephilim.Engine.Rendering
                 if (_data.TextureSlotIndex >= BatchData.MaxNumTextures) ;
                     // Next batch
 
-                textureIndex = (float)_data.TextureSlotIndex;
+                textureIndex = _data.TextureSlotIndex;
                 _data.TextureSlots[_data.TextureSlotIndex] = texture;
                 _data.TextureSlotIndex++;
             }
 
-            //for (int i = 0; i < quadVertexCount; i++)
-            //{
-            //    _data.QuadVertexBufferPtrPosition = transform * _data.QuadVertexPositions[i];
-            //    _data.QuadVertexBufferPtr->Color = tintColor;
-            //    _data.QuadVertexBufferPtr->TexCoord = textureCoords[i];
-            //    _data.QuadVertexBufferPtr->TexIndex = textureIndex;
-            //    _data.QuadVertexBufferPtr->TilingFactor = tilingFactor;
-            //    _data.QuadVertexBufferPtr++;
-            //}
+            fixed (Vertex* vertexArrayFixedPtr = _data.QuadVertcies)
+            {
+                var vertexArrayPtr = vertexArrayFixedPtr;
 
-            //_data.QuadIndexCount += 6;
+                // store the data in our vertexArray
+                for (int i = 0; i < 4; i++)
+                {
+                    *(vertexArrayPtr + i) = new Vertex(_data.QuadVertexPositions[i], transform, textureCoords[i], color, texture.ID);
+                    _data.QuadVertexCount++;
+                }
+            }
 
-            //_data.Stats.QuadCount++;
-
+            _data.QuadIndexCount += 6;
         }
 
         public static void EndScene()
         {
             if (!HasCamera)
                 return;
+            FlushBatch();
             //Quad.UnbindQuad();
-            //_shader.Unbind();
+            _data.Shader.Unbind();
         }
 
         public static void Dispose()
@@ -245,6 +241,23 @@ namespace Nephilim.Engine.Rendering
             foreach (Shader shader in Shader.Shaders)
             {
                 shader.Dispose();
+            }
+        }
+
+        private static void DebugCallback(DebugSource source,
+                                  DebugType type,
+                                  int id,
+                                  DebugSeverity severity,
+                                  int length,
+                                  IntPtr message,
+                                  IntPtr userParam)
+        {
+            string messageString = Marshal.PtrToStringAnsi(message, length);
+            Console.WriteLine($"{severity} {type} | {messageString}");
+
+            if (type == DebugType.DebugTypeError)
+            {
+                throw new Exception(messageString);
             }
         }
     }

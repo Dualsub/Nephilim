@@ -24,11 +24,20 @@ namespace Nephilim.BuildTool.Builders
             List<Task<string[]>> tasks = new List<Task<string[]>>()
             {
                 Task.Run(() => Directory.GetFiles(path, "*.png", SearchOption.AllDirectories)),
+                Task.Run(() => Directory.GetFiles(path, "*.wav", SearchOption.AllDirectories)),
                 Task.Run(() => Directory.GetFiles(path, "*.scene", SearchOption.AllDirectories)),
                 Task.Run(() => Directory.GetFiles(path, "*.prefab", SearchOption.AllDirectories)),
                 Task.Run(() => Directory.GetFiles(path, "*.anim", SearchOption.AllDirectories)),
                 Task.Run(() => Directory.GetFiles(path, "*.glsl", SearchOption.AllDirectories))
             };
+
+            if(args.Length > 2)
+            {
+                foreach(var fileExtention in args[2].Split(":"))
+                {
+                    tasks.Add(Task.Run(() => Directory.GetFiles(path, "*."+fileExtention.Replace(".", "") , SearchOption.AllDirectories)));
+                }
+            }
 
             var loadingTask = Task.WhenAll(tasks);
 
@@ -72,7 +81,18 @@ namespace Nephilim.BuildTool.Builders
                             }
                             data.Textures.TryAdd(name, rawData);
                             break;
-                        case ".waw":
+                        case ".wav":
+                            byte[] buff = null;
+                            using (FileStream fs = new FileStream(asset,
+                                                           FileMode.Open,
+                                                           FileAccess.Read))
+                            {
+                                BinaryReader br = new BinaryReader(fs);
+                                long numBytes = new FileInfo(asset).Length;
+                                buff = br.ReadBytes((int)numBytes);
+                                data.AudioFiles.Add(name, buff);
+                            }
+
                             break;
                         default:
                             var fileText = string.Empty;
@@ -100,12 +120,12 @@ namespace Nephilim.BuildTool.Builders
             if (File.Exists(newFile))
                 File.Delete(newFile);
 
-            FileStream fs = new FileStream(newFile, FileMode.OpenOrCreate);
+            FileStream fileStream = new FileStream(newFile, FileMode.OpenOrCreate);
 
             BinaryFormatter formatter = new BinaryFormatter();
             try
             {
-                using (GZipStream zipStream = new GZipStream(fs, CompressionMode.Compress, false))
+                using (GZipStream zipStream = new GZipStream(fileStream, CompressionMode.Compress, false))
                 {
                     formatter.Serialize(zipStream, data);
                 }
@@ -117,7 +137,7 @@ namespace Nephilim.BuildTool.Builders
             }
             finally
             {
-                fs.Close();
+                fileStream.Close();
                 Console.WriteLine($"Packaging Successful!");
             }
             Console.WriteLine("Serlized data.");
@@ -130,7 +150,9 @@ namespace Nephilim.BuildTool.Builders
 
         public void GetArgsInfo(ref BuilderArgsInfo builderArgsInfo)
         {
-            throw new NotImplementedException();
+            builderArgsInfo.AddArgument("search-path", "The path to search for assets in.");
+            builderArgsInfo.AddArgument("output-path", "The path to where the resulting .dat file will be stored.");
+            builderArgsInfo.AddArgument("add-file-types", "The additional file types to search for. Separted with an \":\".");
         }
 
         public void Initilize()

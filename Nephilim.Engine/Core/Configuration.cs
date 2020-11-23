@@ -84,8 +84,9 @@ namespace Nephilim.Engine.Core
 
         public static Configuration Load()
         {
-            var config = new Configuration();
-            string windowPath = @"../../../Configs/Window.config";
+            var config = new Configuration(); 
+            string windowPath = Util.UtilFunctions.FindFilePath(@"/Configs/Window.config");
+
 
             if (File.Exists(windowPath))
             {

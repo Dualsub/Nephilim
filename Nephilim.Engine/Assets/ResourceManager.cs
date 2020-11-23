@@ -1,4 +1,5 @@
 ﻿using Nephilim.Engine.Assets.Loaders;
+using Nephilim.Engine.Audio;
 using Nephilim.Engine.Rendering;
 using Nephilim.Engine.Util;
 using Nephilim.Engine.World;
@@ -27,6 +28,7 @@ namespace Nephilim.Engine.Assets
         private Dictionary<Type, ILoader> _loaders = new Dictionary<Type, ILoader>()
         {
             { typeof(Texture), new TextureLoader() },
+            { typeof(AudioClip), new AudioLoader() },
             { typeof(string), new AssetLoader() }
         };
 
@@ -247,29 +249,29 @@ namespace Nephilim.Engine.Assets
     {
         public readonly Dictionary<string, string> Assets = null;
         public readonly Dictionary<string, byte[]> Textures = null;
-        public readonly Dictionary<string, object> SoundFiles = null;
+        public readonly Dictionary<string, byte[]> AudioFiles = null;
 
-        public int Count { get => Assets.Count + Textures.Count + SoundFiles.Count; }
+        public int Count { get => Assets.Count + Textures.Count + AudioFiles.Count; }
 
         public ResourceData()
         {
             Assets = new Dictionary<string, string>();
             Textures = new Dictionary<string, byte[]>();
-            SoundFiles = new Dictionary<string, object>();
+            AudioFiles = new Dictionary<string, byte[]>();
         }
 
         public ResourceData(SerializationInfo info, StreamingContext context)
         {
             Assets = (Dictionary<string, string>)info.GetValue("Assets", typeof(Dictionary<string, string>));
             Textures = (Dictionary<string, byte[]>)info.GetValue("Textures", typeof(Dictionary<string, byte[]>));
-            SoundFiles = (Dictionary<string, object>)info.GetValue("SoundFiles", typeof(Dictionary<string, object>));
+            AudioFiles = (Dictionary<string, byte[]>)info.GetValue("SoundFiles", typeof(Dictionary<string, byte[]>));
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("Assets", Assets);
             info.AddValue("Textures", Textures);
-            info.AddValue("SoundFiles", SoundFiles);
+            info.AddValue("SoundFiles", AudioFiles);
         }
     }
 

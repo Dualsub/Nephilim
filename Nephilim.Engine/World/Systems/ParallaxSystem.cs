@@ -6,7 +6,7 @@ namespace Nephilim.Engine.World.Systems
 {
     class ParallaxSystem : System 
     {
-        protected override void OnUpdate(Registry registry, TimeStep ts)
+        protected override void OnFixedUpdate(Registry registry)
         {
             foreach (var entity in registry.GetEntitiesWithComponent<ParallaxComponent>())
             {

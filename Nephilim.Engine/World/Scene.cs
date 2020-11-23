@@ -88,15 +88,15 @@ namespace Nephilim.Engine.World
             return LoadData(await Task.WhenAll(tasks));
         }
 
-        private static List<EntityData> LoadEnity(SerializedPrefab serializedPrefab, JsonSerializerSettings serlizerSettings) 
+        private static List<EntityData> LoadEnity(SerializedPrefab serializedPrefab, JsonSerializerSettings serlizerSettings, string parentTag = null) 
         {
             string fileText;
 
             fileText = Application.ResourceManager.Load<string>(serializedPrefab.Name);
 
-
             if (string.IsNullOrEmpty(fileText))
                 return null;
+
 
             Dictionary<string, object> components = JsonConvert.DeserializeObject<Dictionary<string, object>>(fileText, serlizerSettings);
 
@@ -105,6 +105,8 @@ namespace Nephilim.Engine.World
             Matrix4 entityTransform = Matrix4.Identity;
 
             EntityData entityData = new EntityData(new List<Tuple<Type, IComponent>>());
+
+            string entityTag = string.Empty;
 
             foreach (var component in components)
             {
@@ -116,27 +118,40 @@ namespace Nephilim.Engine.World
                 {
                     var transformComp = comp as TransformComponent;
                     var transform = transformComp.GetTransform() * serializedPrefab.Transform;
+                    
+                    if(!string.IsNullOrEmpty(parentTag))
+                        transformComp.ParentTag = parentTag;
+
                     entityTransform = transform;
+                }
+                if (comp is TagComponent)
+                {
+                    entityTag = (comp as TagComponent).Tag;
                 }
                 entityData.Components.Add(new Tuple<Type, IComponent>(componentType, comp));
             }
 
             result.Add(entityData);
 
-            //TODO: Make so that transform is set first.
-            foreach (var component in components)
+            if (!string.IsNullOrEmpty(entityTag))
             {
-                Type componentType = Util.UtilFunctions.GetTypeByName(component.Key);
-                if (componentType is null)
-                    return null;
-                IComponent comp = (IComponent)((JObject)component.Value).ToObject(componentType);
-                if (comp is PrefabComponent)
+                //TODO: Make so that transform is set first.
+                foreach (var component in components)
                 {
-                    var child = comp as PrefabComponent;
-                    foreach(var childEntity in LoadEnity(new SerializedPrefab(child.PrefabFile, entityTransform), serlizerSettings))
-                        result.Add(childEntity);
+                    Type componentType = Util.UtilFunctions.GetTypeByName(component.Key);
+                    if (componentType is null)
+                        return null;
+                    IComponent comp = (IComponent)((JObject)component.Value).ToObject(componentType);
+                    if (comp is ChildComponent)
+                    {
+                        var child = comp as ChildComponent;
+                        foreach (var childEntity in LoadEnity(new SerializedPrefab(child.PrefabFile, entityTransform), serlizerSettings, entityTag))
+                            result.Add(childEntity);
+                    }
                 }
             }
+
+
 
             return result;
         }

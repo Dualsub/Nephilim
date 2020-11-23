@@ -1,0 +1,10 @@
+﻿{
+	"Name": "SMG",
+	"DefaultMagSize": 30,
+	"BaseDamage": 10.0,
+	"FireRate": 500.0,
+	"Spread": 2.0,
+	"ShakeAmount": 1.0,
+	"SpriteSheetName": "SMG",
+	"GunSoundName": "SMG_Fire"
+}

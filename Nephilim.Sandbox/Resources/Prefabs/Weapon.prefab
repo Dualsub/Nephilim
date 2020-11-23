@@ -1,0 +1,45 @@
+{
+  "TransformComponent": {
+    "position": {
+      "x": -30.0,
+      "y": 38.0,
+      "z": 10.0
+    },
+
+    "rotation": {
+      "x": 0.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+
+    "scale": {
+      "x": 1.0,
+      "y": 1.0,
+      "z": 1.0
+    },
+
+    "ParentTag": "Player"
+  },
+  "ShakePlayer": {
+    "ShakeRadius": 1.5,
+    "FallOff": 400,
+    "Frequency": 20
+  },
+  "WeaponComponent": {
+    "DefaultWeapon": "Shotgun",
+    "Weapons": [
+      "AssaultRifle",
+      "Shotgun",
+      "SMG"
+    ],
+    "BulletTextureFile": "Bullet"
+  },
+  "TagComponent": {
+    "Tag": "Weapon"
+  },
+  "SpriteAnimator": {
+    "AnimationFile": "WeaponsSheet",
+    "DefaultAnimation": "ARIdle",
+    "FrameRate": 12.0
+  }
+}

@@ -1,4 +1,5 @@
 ﻿using Nephilim.Engine.Assets;
+using Nephilim.Engine.Input;
 using Nephilim.Engine.Physics;
 using Nephilim.Engine.Rendering;
 using Nephilim.Engine.Util;
@@ -18,6 +19,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static Nephilim.Engine.World.Registry;
+using static Nephilim.Engine.World.System;
 
 namespace Nephilim.Engine.Core
 {
@@ -44,25 +46,42 @@ namespace Nephilim.Engine.Core
         public void OnAdded()
         {
             _registry = new Registry();
+
+            InputManager.KeyDown += (e) =>
+            {
+                if(e.Key == OpenTK.Windowing.GraphicsLibraryFramework.Keys.Backslash)
+                    ReloadScene();
+            };
         }
 
         public void OnStart()
         {
+            LoadLevel(_defaultScene);
+        }
+
+        private void LoadLevel(string level)
+        {
             _loadingEntity = _registry.CreateAbstractEntity();
             var component = new LoadingScreenComponent();
             component.Texture = Texture.LoadTextureUnsafe(_loadingScreen);
-            component.Transform *= Matrix4.CreateScale(0.64f, 0.64f, 1);
+            component.Transform *= Matrix4.CreateScale(1f, 1f, 1);
             component.Transform *= Matrix4.CreateFromAxisAngle(new Vector3(1), 0);
             component.Transform *= Matrix4.CreateTranslation(Application.Width * 3f / 10f, -Application.Height * 3f / 10f, 0);
-            _ =_registry.AddSingletonComponent(_loadingEntity, component);
+            _ = _registry.AddSingletonComponent(_loadingEntity, component);
             _registry.AddSystem<LoadingScreenSystem>(World.System.UpdateFlags.Update | World.System.UpdateFlags.Render);
 
             _loadingScreenCamera = _registry.CreateAbstractEntity();
             _ = _registry.AddSingletonComponent(_loadingScreenCamera, new OrthoCameraComponent(_registry.CachedTransform != Matrix4.Identity ? _registry.CachedTransform : Matrix4.Identity));
-            
-            _loadingTask = Scene.LoadSceneAsync(_defaultScene);
-            
+
+            _loadingTask = Scene.LoadSceneAsync(level);
+
             _registry.ActivateSystems();
+        }
+
+        private void ReloadScene()
+        {
+            _registry.FlushEntities();
+            LoadLevel(_defaultScene);
         }
 
         private void OnLoaded(Task<SceneData> task)
@@ -87,19 +106,19 @@ namespace Nephilim.Engine.Core
                 var entity2 = _registry.CreateAbstractEntity();
                 _ = _registry.AddSingletonComponent(entity2, new PhysicsWorld2D());
 
-                AddSystems.Invoke(_registry);
 
-                _registry.AddSystem<ParallaxSystem>(World.System.UpdateFlags.Update);
-                _registry.AddSystem<Physics2DSystem>(World.System.UpdateFlags.FixedUpdate | World.System.UpdateFlags.EntitySpawned | World.System.UpdateFlags.EntityDestroyed);
-                _registry.AddSystem<CameraShakeSystem>(World.System.UpdateFlags.Update);
-                _registry.AddSystem<LifeTimeSystem>(World.System.UpdateFlags.Update);
-                _registry.AddSystem<TransformSystem>(World.System.UpdateFlags.EntitySpawned);
-                _registry.AddSystem<SpriteRenderSystem>(World.System.UpdateFlags.Render);
+                _registry.AddSystem<Physics2DSystem>(UpdateFlags.FixedUpdate | UpdateFlags.EntitySpawned | UpdateFlags.EntityDestroyed);
+                _registry.AddSystem<ParallaxSystem>(UpdateFlags.FixedUpdate);
+                _registry.AddSystem<CameraShakeSystem>(UpdateFlags.Update);
+                _registry.AddSystem<LifeTimeSystem>(UpdateFlags.Update);
+                _registry.AddSystem<ParticleSystem>(UpdateFlags.Update);
+                _registry.AddSystem<SpriteRenderSystem>(UpdateFlags.Render);
 #if DEBUG
-                _registry.AddSystem<ConsoleSystem>(World.System.UpdateFlags.LateUpdate);
-                _registry.AddSystem<DebugCameraSystem>(World.System.UpdateFlags.Update);
-                _registry.AddSystem<ColliderDebugSystem>(World.System.UpdateFlags.Render);
+                _registry.AddSystem<ConsoleSystem>(UpdateFlags.LateUpdate);
+                _registry.AddSystem<DebugCameraSystem>(UpdateFlags.Update);
+                _registry.AddSystem<ColliderDebugSystem>(UpdateFlags.Render);
 #endif
+                AddSystems.Invoke(_registry);
                 _registry.ActivateSystems();
             }
         }

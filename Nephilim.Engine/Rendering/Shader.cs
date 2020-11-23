@@ -39,6 +39,13 @@ namespace Nephilim.Engine.Rendering
             GL.Uniform3(GetUniformLocation(name), ref value);
         }
 
+        internal void SetUniform(string name, Color4 value)
+        {
+            int location = GetUniformLocation(name);
+            var vec4 = new Vector4(value.R, value.G, value.B, value.A);
+            GL.Uniform4(location, ref vec4);
+        }
+
         internal void SetUniform(string name, Vector4 value)
         {
             int location = GetUniformLocation(name);
@@ -52,12 +59,13 @@ namespace Nephilim.Engine.Rendering
 
         internal void SetUniform(string name, int[] value)
         {
-            GL.Uniform1(GetUniformLocation(name), value.Length, value);
+            int location = GetUniformLocation(name);
+            GL.Uniform1(location, value.Length, value);
         }
 
-        public static Shader LoadShader(string file)
+        public static Shader LoadShader(string file, bool usePath = false)
         {
-            string source = LoadSource(file);
+            string source = LoadSource(file, usePath);
             if(!(source.Contains("#type vertex") && source.Contains("#type fragment")))
             {
                 Log.Error("");
@@ -113,9 +121,9 @@ namespace Nephilim.Engine.Rendering
             }
         }
 
-        private static string LoadSource(string path)
+        private static string LoadSource(string path, bool usePath = false)
         {
-            return Application.ResourceManager.Load<string>(path);
+            return usePath ? File.ReadAllText(path) : Application.ResourceManager.Load<string>(path);
         }
 
 

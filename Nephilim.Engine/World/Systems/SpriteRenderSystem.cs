@@ -52,8 +52,27 @@ namespace Nephilim.Engine.World.Systems
                 }
 
             }
+
+            foreach (var entity in registry.GetEntitiesWithComponent<ParticleEmitter2D>())
+            {
+                if (registry.TryGetComponent(entity, out TransformComponent transformComponent))
+                {
+                    var emitter = registry.GetComponent<ParticleEmitter2D>(entity);
+                    if(emitter.IsActive && emitter.HasBeenSet)
+                    {
+                        for (int i = 0; i < emitter.Length; i++)
+                        {
+                            Matrix4 particleTransform = Matrix4.Identity;
+                            particleTransform *= Matrix4.CreateScale(emitter.Sizes[i].X / Quad.DefaultSize, emitter.Sizes[i].Y / Quad.DefaultSize, 1);
+                            particleTransform *= Matrix4.CreateRotationZ(emitter.AnglesAndTorques[i].X);
+                            particleTransform *= Matrix4.CreateTranslation(new Vector3(emitter.PositionsAndVelocitys[i].X, emitter.PositionsAndVelocitys[i].Y, 10));
+                            Renderer2D.DrawQuad(new Vector4(emitter.Colors[i].R, emitter.Colors[i].G, emitter.Colors[i].B, emitter.Colors[i].A), particleTransform);
+                        }
+                    }
+                }
+            }
 #if DEBUG
-            if ((Renderer2D.DebugFlags & DebugRenderingFlags.DebugRenderers) == DebugRenderingFlags.DebugRenderers)
+                if ((Renderer2D.DebugFlags & DebugRenderingFlags.DebugRenderers) == DebugRenderingFlags.DebugRenderers)
             {
                 var debugEntities = registry.GetEntitiesWithComponent<DebugRenderer>();
 

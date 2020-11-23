@@ -7,6 +7,7 @@ using Nephilim.Engine.World.Components;
 using Nephilim.Engine.Util;
 using OpenTK.Mathematics;
 using System.Collections.Generic;
+using System;
 
 namespace Nephilim.Engine.World.Systems
 {
@@ -57,7 +58,17 @@ namespace Nephilim.Engine.World.Systems
         {
 			if (registry.TryGetSingletonComponent(out PhysicsWorld2D physicsWorld))
 			{
-				physicsWorld.World.Step(PhysicsGlobals.TimeStep * Application.TimeDilation, PhysicsWorld2D.VelocityIterations, PhysicsWorld2D.PositionIterations);
+                try
+                {
+					physicsWorld.World.Step(PhysicsGlobals.TimeStep * Application.TimeDilation, PhysicsWorld2D.VelocityIterations, PhysicsWorld2D.PositionIterations);
+                }
+                catch (Exception)
+                {
+					Log.Error("Physics error. Step was not done.");
+                }
+				
+				physicsWorld.QueryContacts(registry);
+
 				var entities = registry.GetEntitiesWithComponent<RigidBody2D>();
 
 				var children = new List<EntityID>();
@@ -66,7 +77,7 @@ namespace Nephilim.Engine.World.Systems
 				{
 					if (registry.TryGetComponent(entity, out TransformComponent transform))
 					{
-						if (transform.ParentTag != string.Empty)
+						if (!string.IsNullOrEmpty(transform.ParentTag))
                         {
 							children.Add(entity);
 							continue;
@@ -75,17 +86,23 @@ namespace Nephilim.Engine.World.Systems
 						var body = registry.GetComponent<RigidBody2D>(entity);
 						transform.SetTransform(body.Position, body.Angle);
                         
-                        if (registry.HasComponent<CameraFollowComponent>(entity) 
+                        if (registry.TryGetComponent<CameraFollowComponent>(entity, out var cameraFollowComponent) 
 							&& registry.TryGetSingletonComponent(out OrthoCameraComponent cameraComponent))
 						{
-							cameraComponent.SetPosition(transform.Position);
+
+							Vector3 pos = cameraComponent.Position;
+							pos += (transform.Position - cameraComponent.Position) * cameraFollowComponent.LagAmount;
+							cameraComponent.SetPosition(pos);
 						}
 					}
 				}
 
-				foreach (var entity in children)
+				foreach (var component in registry.GetAllComponentsOfType<TransformComponent>())
 				{
-					var transform = registry.GetComponent<TransformComponent>(entity);
+					var transform = component as TransformComponent;
+					if (string.IsNullOrEmpty(transform.ParentTag))
+						continue;
+
 					EntityID parent = registry.GetEntityByTag(transform.ParentTag);
 
 					if (parent != default)
@@ -93,7 +110,7 @@ namespace Nephilim.Engine.World.Systems
 						if (registry.TryGetComponent(parent, out TransformComponent parentTransform) 
 						&& !(parentTransform is null))
 						{
-							transform.SetTransform(transform.DefaultTransform * parentTransform.GetTransform());
+							transform.SetTransform(transform.GetLocalTransform() * parentTransform.GetTransform());
 						}
 					}
 				}
@@ -160,6 +177,7 @@ namespace Nephilim.Engine.World.Systems
 			physicsWorld.World = world;
 			physicsWorld.SetBulletListner();
 		}
+
 
 		protected override void OnDeactivated(Registry registry)
 		{

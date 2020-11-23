@@ -426,12 +426,12 @@ namespace Nephilim.Engine.World
             return default;
         }
 
-        public Dictionary<EntityID, IComponent> GetAllComponentsOfType<T>() where T : IComponent
+        public IEnumerable<IComponent> GetAllComponentsOfType<T>() where T : IComponent
         {
             if (_components.TryGetValue(typeof(T), out var components))
-                return components;
+                return components.Values;
             else
-                return new Dictionary<EntityID, IComponent>(0);
+                return null;
         }
         public bool TryGetComponent<T>(Entity entity, out T outComponent) where T : IComponent
         {
@@ -555,7 +555,7 @@ namespace Nephilim.Engine.World
 
         public void ReloadScene()
         {
-            if(TryGetSingletonComponent(out OrthoCameraComponent orthoCamera) && GetAllComponentsOfType<CameraFollowComponent>().Count <= 0)
+            if(TryGetSingletonComponent(out OrthoCameraComponent orthoCamera) && GetAllComponentsOfType<CameraFollowComponent>().Count() <= 0)
             {
                 _cachedTransform = Matrix4.CreateTranslation(orthoCamera.Position);
             }
