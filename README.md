@@ -1,11 +1,8 @@
 # Nephilim
 
-Game engine and tools for the project codename Nephilim.
+Game engine and tools for the project called Nephilim.  
 
-## Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
-Please make sure to update tests as appropriate.
+![alt text](https://i.gyazo.com/d3f07677ca48b3e4e9d768bb4d8f6e58.gif)
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
